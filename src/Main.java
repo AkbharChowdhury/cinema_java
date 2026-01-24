@@ -1,6 +1,6 @@
 import models.Movie;
 import models.SearchMovies;
-
+//git rm --cached .gitignore
 void main() {
     var props = ENVManager.getENV();
 //    var username = props.get("USERNAME");
