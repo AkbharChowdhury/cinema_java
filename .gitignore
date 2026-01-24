@@ -1,0 +1,6 @@
+src/config.env
+.jar
+.idea
+out/production/cinema_java
+.DS_Store
+cinema_java.iml
