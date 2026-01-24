@@ -16,15 +16,14 @@ public class Database {
 
     private static volatile Database instance;
 
-    private Connection connect() {
+    private Connection getConnection() {
         Connection connection = null;
-        Properties props = ENVManager.getENV();
 
         try {
-            String dbName = "cinema";
+            Properties props = ENVManager.getENV();
+            final String DB_NAME = "cinema";
             Class.forName("org.postgresql.Driver");
-//            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/" + dbName, props.get("USERNAME").toString(), props.get("PASSWORD").toString());
-            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/" + dbName, props.getProperty("USERNAME"), props.getProperty("PASSWORD"));
+            connection = DriverManager.getConnection(String.format("jdbc:postgresql://localhost:5432/%s", DB_NAME), props.getProperty("USERNAME"), props.getProperty("PASSWORD"));
 
         } catch (Exception ex) {
             printErrorMessage.accept(ex.getMessage());
@@ -55,14 +54,16 @@ public class Database {
 
     public List<String> getMovieGenres() {
         List<String> list = new ArrayList<>();
-        try (var con = connect();
+        try (var con = getConnection();
              var stmt = con.prepareStatement("SELECT DISTINCT genre FROM movie_genres NATURAL JOIN genres");
-             ResultSet rs = stmt.executeQuery()) {
-            while (rs.next())
+             var rs = stmt.executeQuery()) {
+
+            while (rs.next()){
                 list.add(rs.getString("genre"));
+            }
 
         } catch (SQLException ex) {
-            printErrorMessage.accept("error "+ ex.getMessage());
+            printErrorMessage.accept(ex.getMessage());
 
         }
 
@@ -72,9 +73,9 @@ public class Database {
 
     public List<Movie> getMovieList() {
         List<Movie> list = new ArrayList<>();
-        try (Connection con = connect();
-             Statement stmt = con.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT * FROM view_all_movies")
+        try (var con = getConnection();
+             var stmt = con.createStatement();
+             var rs = stmt.executeQuery("SELECT movie_id, title, genres  FROM view_all_movies")
         ) {
 
             while (rs.next()) {
@@ -96,9 +97,9 @@ public class Database {
 
     public List<Genre> getAllGenres() {
         List<Genre> list = new ArrayList<>();
-        try (Connection con = connect();
-             Statement stmt = con.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT genre, genre_id FROM genres")
+        try (var con = getConnection();
+             var stmt = con.createStatement();
+             var rs = stmt.executeQuery("SELECT genre, genre_id FROM genres")
         ) {
 
             while (rs.next()) {
@@ -115,14 +116,11 @@ public class Database {
 
     public String getMovieName(int movieID) {
 
-        try (var con = connect(); var stmt = con.prepareStatement("SELECT title FROM movies WHERE movie_id = ?")) {
+        try (var con = getConnection(); var stmt = con.prepareStatement("SELECT title FROM movies WHERE movie_id = ?")) {
             stmt.setInt(1, movieID);
             try (ResultSet rs = stmt.executeQuery()) {
-                rs.next();
-                return rs.getString("title");
+                if(rs.next()) return rs.getString("title");
             }
-
-
         } catch (Exception ex) {
             printErrorMessage.accept(ex.getMessage());
         }
@@ -134,7 +132,7 @@ public class Database {
 
     public List<String> getSelectedMovieGenres(int movieID) {
         List<String> list = new ArrayList<>();
-        try (var con = connect();
+        try (var con = getConnection();
              var stmt = con.prepareStatement("SELECT genre FROM fn_get_selected_movie_genres(?)")) {
             stmt.setInt(1, movieID);
             ResultSet rs = stmt.executeQuery();
@@ -150,7 +148,7 @@ public class Database {
 
 
     public void deleteRecord(String tableName, String idField, int id) {
-        try (Connection con = connect();
+        try (Connection con = getConnection();
              PreparedStatement stmt = con.prepareStatement(String.format("DELETE FROM %s WHERE %s = ?", tableName, idField))) {
             stmt.setInt(1, id);
             stmt.execute();
@@ -160,7 +158,7 @@ public class Database {
     }
 
     public void addMovieGenres(int movieID, List<Integer> genreIDs) {
-        try (var con = connect()) {
+        try (var con = getConnection()) {
             for (int genreId : genreIDs) {
                 var stmt = con.prepareStatement("INSERT INTO movie_genres(genre_id, movie_id) VALUES(?, ?)");
                 stmt.setInt(1, genreId);
@@ -174,7 +172,7 @@ public class Database {
     }
 
     public void updateMovieTitle(String title, int movieID) {
-        try (var con = connect()) {
+        try (var con = getConnection()) {
             var stmt = con.prepareStatement("UPDATE movies SET title = ? WHERE movie_id = ?");
             stmt.setString(1, title);
             stmt.setInt(2, movieID);
@@ -186,7 +184,7 @@ public class Database {
     }
 
     public boolean addMovieAndGenres(String title, Set<Integer> genres) {
-        try (var con = connect()) {
+        try (var con = getConnection()) {
             var stmt = con.prepareStatement("CALL pr_add_movie_and_genres(?, ?)");
             Array genreArray = con.createArrayOf("INTEGER", new Object[]{genres.toArray(new Integer[0])});
             stmt.setString(1, title);

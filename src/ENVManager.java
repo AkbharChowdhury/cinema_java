@@ -16,7 +16,7 @@ public class ENVManager {
             props.load(inputStream);
 
         } catch (IOException ex) {
-            System.err.println("there was an error fetching env data");
+            System.err.println("There was an error fetching env data");
         }
         return props;
     }
