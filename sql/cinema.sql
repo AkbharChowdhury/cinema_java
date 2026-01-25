@@ -100,8 +100,8 @@ CREATE PROCEDURE pr_add_movie_and_genres(movie_title varchar, genres integer[])
     AS
 $body$
 DECLARE
-genre_id_index INT;
-	inserted_movie_id INT;
+    genre_id_index INT;
+    inserted_movie_id INT;
 
 BEGIN
 
