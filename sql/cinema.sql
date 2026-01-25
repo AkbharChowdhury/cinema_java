@@ -110,9 +110,7 @@ INSERT INTO movies(title) VALUES(movie_title) RETURNING movie_id INTO inserted_m
 FOREACH genre_id_index IN ARRAY genres
 		LOOP
 			INSERT INTO movie_genres (movie_id, genre_id) VALUES(inserted_movie_id, genre_id_index);
-END LOOP;
-
-
+        END LOOP;
 END;
 $body$
 language plpgsql;
