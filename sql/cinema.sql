@@ -78,7 +78,7 @@ WHERE title ILIKE term
 GROUP BY m.movie_id
 HAVING string_agg(DISTINCT g.genre, ' | ') ILIKE myGenre
     $$
-    LANGUAGE sql;
+    LANGUAGE SQL;
 SELECT * FROM fn_get_movies('%%','%%');
 
 
@@ -118,14 +118,13 @@ $body$
 language plpgsql;
 
 -- get selected movie genres based on a movie id
-CREATE OR REPLACE FUNCTION fn_get_selected_movie_genres(selected_movie_id INT)
-   RETURNS TABLE ( genre VARCHAR )
-AS
+CREATE FUNCTION fn_get_selected_movie_genres(selected_movie_id INT)
+    RETURNS TABLE ( genre VARCHAR )
+    AS
 $$
 SELECT genre
 FROM movie_genres mg
-         NATURAL JOIN genres g
-WHERE mg.movie_id=selected_movie_id
-
-    $$
-   LANGUAGE sql;
+         NATURAL JOIN genres
+WHERE mg.movie_id=selected_movie_id;
+$$
+LANGUAGE SQL;

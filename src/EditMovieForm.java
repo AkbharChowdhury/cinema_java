@@ -18,15 +18,10 @@ public class EditMovieForm extends JFrame implements ActionListener {
     private final JButton btnUpdateMovie = new JButton("Update Movie");
     private final JButton btnUndoTitle = new JButton("Undo title");
     private final JButton btnUndoGenre = new JButton("Undo Genre");
-
     private final JButton[] buttons = {btnUpdateMovie, btnUndoTitle, btnUndoGenre};
-
-
     private final List<Checkbox> checkboxes;
 
-
     public EditMovieForm(MainMenu mainMenuForm) {
-        System.out.println(MOVIE_ID);
         mainMenu = mainMenuForm;
         txtTitle.setText(MOVIE_TITLE);
         setTitle("Edit Movie");
