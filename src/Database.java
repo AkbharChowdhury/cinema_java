@@ -18,13 +18,11 @@ public class Database {
 
     private Connection getConnection() {
         Connection connection = null;
-
         try {
             Properties props = ENVManager.getENV();
             final String DB_NAME = "cinema";
             Class.forName("org.postgresql.Driver");
             connection = DriverManager.getConnection(String.format("jdbc:postgresql://localhost:5432/%s", DB_NAME), props.getProperty("USERNAME"), props.getProperty("PASSWORD"));
-
         } catch (Exception ex) {
             printErrorMessage.accept(ex.getMessage());
         }
@@ -42,13 +40,10 @@ public class Database {
                 }
             }
         } catch (Exception ex) {
-
             Messages.printErrorMessage.accept(ex.getMessage());
-
         }
 
         return instance;
-
 
     }
 
@@ -64,7 +59,6 @@ public class Database {
 
         } catch (SQLException ex) {
             printErrorMessage.accept(ex.getMessage());
-
         }
 
         return list.stream().sorted(String.CASE_INSENSITIVE_ORDER).toList().stream().map(WordUtils::capitalizeFully).toList();
@@ -111,28 +105,30 @@ public class Database {
 
     }
 
-    public String getMovieName(int movieID) {
+    public String getMovieName(int id) {
 
         try (var con = getConnection();
              var stmt = con.prepareStatement("SELECT title FROM movies WHERE movie_id = ?")) {
-            stmt.setInt(1, movieID);
+            stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) return rs.getString(TableName.MOVIE_TITLE);
+                if (rs.next()) {
+                    return rs.getString(TableName.MOVIE_TITLE);
+                }
             }
         } catch (Exception ex) {
             printErrorMessage.accept(ex.getMessage());
         }
 
-        return MessageFormat.format("Error fetching movie name by movie id, Movie ID {0} does not exist", movieID);
+        return MessageFormat.format("Error fetching movie name by movie id, Movie ID {0} does not exist", id);
 
     }
 
 
-    public List<String> getSelectedMovieGenres(int movieID) {
+    public List<String> getSelectedMovieGenres(int id) {
         List<String> list = new ArrayList<>();
         try (var con = getConnection();
              var stmt = con.prepareStatement("SELECT genre FROM fn_get_selected_movie_genres(?);")) {
-            stmt.setInt(1, movieID);
+            stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 list.add(rs.getString(TableName.GENRE));

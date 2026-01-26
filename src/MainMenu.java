@@ -9,10 +9,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Vector;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 
 public class MainMenu extends JFrame implements ActionListener {
@@ -98,9 +99,9 @@ public class MainMenu extends JFrame implements ActionListener {
         return genres;
     }
 
-    void main() {new MainMenu();}
-
-
+    void main() {
+        new MainMenu();
+    }
 
 
     @Override
@@ -116,13 +117,12 @@ public class MainMenu extends JFrame implements ActionListener {
 
     }
 
-    private boolean isSelectionRequired() {
-        return table.getSelectedRow() == -1;
-    }
+    private final Supplier<Boolean> isSelectionRequired = () -> table.getSelectedRow() == -1;
+
 
     private void editMovie() {
 
-        if (isSelectionRequired()) {
+        if (isSelectionRequired.get()) {
             showMovieRequiredMessage();
             return;
         }
@@ -130,19 +130,20 @@ public class MainMenu extends JFrame implements ActionListener {
         new EditMovieForm(MainMenu.this);
     }
 
-    int getSelectedMovieID() {
+    private int getSelectedMovieID() {
         int selectedIndex = table.getSelectedRow();
         movieList = search.filterResults.get();
         return movieList.get(selectedIndex).id();
     }
 
-    void showMovieRequiredMessage() {
+    private void showMovieRequiredMessage() {
+
         Messages.showErrorMessage("Movie required!", "Please select a movie!");
     }
 
-    void removeMovie() {
+    private void removeMovie() {
 
-        if (isSelectionRequired()) {
+        if (isSelectionRequired.get()) {
             showMovieRequiredMessage();
             return;
         }
@@ -155,20 +156,27 @@ public class MainMenu extends JFrame implements ActionListener {
     }
 
 
-    void populateList() {
+    private void populateList() {
         ((DefaultTableModel) table.getModel()).setRowCount(0);
         List<Movie> movies = search.filterResults.get();
-        int movieSize = movies.size();
-        for (int i = 0; i < movieSize; i++) {
-            Movie movie = movies.get(i);
-            tableModel.addRow(new Object[0]);
-            tableModel.setValueAt(movie.title(), i, MovieEnum.TITLE.getValue());
-            tableModel.setValueAt(movie.genres(), i, MovieEnum.GENRE.getValue());
+        long count = Arrays.stream(MovieEnum.values()).count();
 
+        final int MOVIE_SIZE = movies.size();
+        for (int i = 0; i < MOVIE_SIZE; i++) {
+            tableModel.addRow(new Object[0]);
+            Movie movie = movies.get(i);
+//            for (int j = 0; j < count; j++) {
+//                tableModel.setValueAt(movies.get(i), i, j);
+//
+//
+//            }
+//            tableModel.setValueAt(movie.title(), i, MovieEnum.TITLE.getValue());
+//            tableModel.setValueAt(movie.genres(), i, MovieEnum.GENRE.getValue());
+            }
 
         }
 
-    }
+
 
 
 }
