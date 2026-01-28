@@ -19,7 +19,7 @@ public class AddMovieForm extends JFrame implements ActionListener {
     private final List<Genre> genres = db.getAllGenres();
     private final JTextField txtTitle = new JTextField(20);
     private final JButton btnAddMovie = new JButton("Add Movie");
-    private final List<Checkbox> checkboxes;
+    private final List<Checkbox> genreCheckboxes;
 
     public AddMovieForm(MainMenu mainMenuForm) {
         mainMenu = mainMenuForm;
@@ -33,8 +33,8 @@ public class AddMovieForm extends JFrame implements ActionListener {
         top.add(txtTitle);
         middle.setLayout(new GridLayout(genres.size(), 2));
 
-        checkboxes = genres.stream().map(genre -> new Checkbox(genre.name())).toList();
-        checkboxes.forEach(middle::add);
+        genreCheckboxes = genres.stream().map(genre -> new Checkbox(genre.name())).toList();
+        genreCheckboxes.forEach(middle::add);
 
         panel.add(top, BorderLayout.NORTH);
         panel.add(middle, BorderLayout.CENTER);
@@ -63,7 +63,7 @@ public class AddMovieForm extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        boolean hasSelectedGenre = Genre.hasSelectedGenre.apply(checkboxes);
+        boolean hasSelectedGenre = Genre.hasSelectedGenre.apply(genreCheckboxes);
         if (txtTitle.getText().trim().isBlank()) {
             Messages.showErrorMessage("", "Movie title is required");
             return;
@@ -73,7 +73,7 @@ public class AddMovieForm extends JFrame implements ActionListener {
             return;
         }
 
-        List<Integer> selectedGenres = Genre.getSelectedGenres(checkboxes, genres).stream().map(Genre::id).toList();
+        List<Integer> selectedGenres = Genre.getSelectedGenres(genreCheckboxes, genres).stream().map(Genre::id).toList();
         boolean hasAddedMovie = db.addMovieAndGenres(txtTitle.getText().trim(), new HashSet<>(selectedGenres));
         if (!hasAddedMovie) {
             Messages.showErrorMessage("", "There was an error adding the movie");
@@ -93,7 +93,7 @@ public class AddMovieForm extends JFrame implements ActionListener {
 
     private void clearForm() {
         txtTitle.setText("");
-        checkboxes.forEach(checkbox -> checkbox.setState(false));
+        genreCheckboxes.forEach(checkbox -> checkbox.setState(false));
     }
 
 
