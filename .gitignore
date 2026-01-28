@@ -4,3 +4,4 @@ src/config.env
 out/production/cinema_java
 .DS_Store
 cinema_java.iml
+src/Main.java

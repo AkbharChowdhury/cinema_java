@@ -73,18 +73,16 @@ public class AddMovieForm extends JFrame implements ActionListener {
             return;
         }
 
-        List<Integer> selectedGenreIDs = Genre.getSelectedGenres(checkboxes, genres).stream().map(Genre::id).toList();
-
-        boolean hasAddedMovie = db.addMovieAndGenres(txtTitle.getText().trim(), new HashSet<>(selectedGenreIDs));
+        List<Integer> selectedGenres = Genre.getSelectedGenres(checkboxes, genres).stream().map(Genre::id).toList();
+        boolean hasAddedMovie = db.addMovieAndGenres(txtTitle.getText().trim(), new HashSet<>(selectedGenres));
         if (!hasAddedMovie) {
             Messages.showErrorMessage("", "There was an error adding the movie");
             return;
         }
+
         clearForm();
         Messages.message("Movie Added");
         redirectToMainMenu();
-
-
     }
 
     private void redirectToMainMenu() {
@@ -99,7 +97,7 @@ public class AddMovieForm extends JFrame implements ActionListener {
     }
 
 
-    static void main(String[] args) {
+    static void main() {
         new AddMovieForm(mainMenu);
     }
 

@@ -126,3 +126,6 @@ FROM movie_genres mg
 WHERE mg.movie_id=selected_movie_id;
 $$
 LANGUAGE SQL;
+-- fetch available genres
+CREATE VIEW available_genres AS
+SELECT DISTINCT genre FROM movie_genres NATURAL JOIN genres;

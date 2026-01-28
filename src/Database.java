@@ -47,61 +47,59 @@ public class Database {
 
     }
 
-    public List<String> getMovieGenres() {
-        List<String> list = new ArrayList<>();
+    public List<String> getAvailableGenres() {
+        List<String> availableGenres = new ArrayList<>();
         try (var con = getConnection();
-             var stmt = con.prepareStatement("SELECT DISTINCT genre FROM movie_genres NATURAL JOIN genres");
+             var stmt = con.prepareStatement("SELECT genre FROM available_genres");
              var rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                list.add(rs.getString(TableName.GENRE));
+                availableGenres.add(rs.getString(1));
             }
 
         } catch (SQLException ex) {
             printErrorMessage.accept(ex.getMessage());
         }
 
-        return list.stream().sorted(String.CASE_INSENSITIVE_ORDER).toList().stream().map(WordUtils::capitalizeFully).toList();
+        return availableGenres.stream().sorted(String.CASE_INSENSITIVE_ORDER).map(WordUtils::capitalizeFully).toList();
 
     }
 
     public List<Movie> getMovieList() {
-        List<Movie> list = new ArrayList<>();
+        List<Movie> movieList = new ArrayList<>();
         try (var con = getConnection();
              var stmt = con.createStatement();
              var rs = stmt.executeQuery("SELECT movie_id, title, genres  FROM view_all_movies")
         ) {
-
             while (rs.next()) {
-                list.add(new Movie(rs.getInt(TableName.MOVIE_ID), rs.getString(TableName.MOVIE_TITLE), rs.getString(TableName.GENRES)));
-
+                movieList.add(new Movie(rs.getInt(TableName.MOVIE_ID), rs.getString(TableName.MOVIE_TITLE), rs.getString(TableName.GENRES)));
             }
 
         } catch (Exception ex) {
             printErrorMessage.accept(ex.getMessage());
 
         }
-        return list;
+        return movieList;
 
     }
 
 
     public List<Genre> getAllGenres() {
-        List<Genre> list = new ArrayList<>();
+        List<Genre> genres = new ArrayList<>();
         try (var con = getConnection();
              var stmt = con.createStatement();
              var rs = stmt.executeQuery("SELECT genre, genre_id FROM genres")
         ) {
 
             while (rs.next()) {
-                list.add(new Genre(rs.getInt(TableName.GENRE_ID), rs.getString(TableName.GENRE)));
+                genres.add(new Genre(rs.getInt(TableName.GENRE_ID), rs.getString(TableName.GENRE)));
             }
 
         } catch (Exception ex) {
             printErrorMessage.accept(ex.getMessage());
 
         }
-        return list;
+        return genres.stream().sorted(Comparator.comparing(Genre::name)).toList();
 
     }
 
@@ -112,7 +110,7 @@ public class Database {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getString(TableName.MOVIE_TITLE);
+                    return rs.getString(1);
                 }
             }
         } catch (Exception ex) {
@@ -125,18 +123,18 @@ public class Database {
 
 
     public List<String> getSelectedMovieGenres(int id) {
-        List<String> list = new ArrayList<>();
+        List<String> genres = new ArrayList<>();
         try (var con = getConnection();
              var stmt = con.prepareStatement("SELECT genre FROM fn_get_selected_movie_genres(?);")) {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                list.add(rs.getString(TableName.GENRE));
+                genres.add(rs.getString(1));
             }
         } catch (Exception ex) {
             printErrorMessage.accept(ex.getMessage());
         }
-        return list.stream().toList();
+        return genres;
 
     }
 
@@ -151,9 +149,9 @@ public class Database {
         }
     }
 
-    public void addMovieGenres(int movieID, List<Integer> genreIDList) {
+    public void addMovieGenres(int movieID, List<Integer> genreIds) {
         try (Connection con = getConnection()) {
-            for (int genreID : genreIDList) {
+            for (int genreID : genreIds) {
                 var stmt = con.prepareStatement("INSERT INTO movie_genres(genre_id, movie_id) VALUES(?, ?)");
                 stmt.setInt(1, genreID);
                 stmt.setInt(2, movieID);

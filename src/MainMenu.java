@@ -11,20 +11,18 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.*;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 
 public class MainMenu extends JFrame implements ActionListener {
     private final Database db = Database.getInstance();
-    private List<Movie> movieList = db.getMovieList();
-    private final SearchMovies search = new SearchMovies(movieList);
+    private List<Movie> movies = db.getMovieList();
+    private final SearchMovies search = new SearchMovies(movies);
 
     private final JButton btnAdd = new JButton("Add");
     private final JButton btnEdit = new JButton("Edit");
     private final JButton btnRemove = new JButton("Remove");
-    private JButton[] buttons = {btnAdd, btnEdit, btnRemove};
+    private final JButton[] buttons = {btnAdd, btnEdit, btnRemove};
 
     private final JTextField txtTitle = new JTextField(40);
     private final JComboBox<String> comboBoxGenres = new JComboBox<>();
@@ -93,8 +91,8 @@ public class MainMenu extends JFrame implements ActionListener {
         });
     }
 
-    List<String> getGenres() {
-        List<String> genres = new ArrayList<>(db.getMovieGenres());
+    private List<String> getGenres() {
+        List<String> genres = new ArrayList<>(db.getAvailableGenres());
         genres.addFirst("Any");
         return genres;
     }
@@ -132,12 +130,11 @@ public class MainMenu extends JFrame implements ActionListener {
 
     private int getSelectedMovieID() {
         int selectedIndex = table.getSelectedRow();
-        movieList = search.filterResults.get();
-        return movieList.get(selectedIndex).id();
+        movies = search.filterResults.get();
+        return movies.get(selectedIndex).id();
     }
 
     private void showMovieRequiredMessage() {
-
         Messages.showErrorMessage("Movie required!", "Please select a movie!");
     }
 
@@ -149,7 +146,7 @@ public class MainMenu extends JFrame implements ActionListener {
         }
 
         if (Messages.hasConfirmed.apply("Are you sure you want to remove this movie?")) {
-            db.deleteRecord("movies", "movie_id", getSelectedMovieID());
+            db.deleteRecord(TableName.MOVIE_TABLE, TableName.MOVIE_ID, getSelectedMovieID());
             tableModel.removeRow(table.getSelectedRow());
             search.setList(db.getMovieList());
         }
@@ -158,25 +155,15 @@ public class MainMenu extends JFrame implements ActionListener {
 
     private void populateList() {
         ((DefaultTableModel) table.getModel()).setRowCount(0);
-        List<Movie> movies = search.filterResults.get();
-        long count = Arrays.stream(MovieEnum.values()).count();
-
-        final int MOVIE_SIZE = movies.size();
-        for (int i = 0; i < MOVIE_SIZE; i++) {
+        List<Movie> filteredMovies = search.filterResults.get();
+        final int TOTAL_NUM_MOVIES = filteredMovies.size();
+        for (int i = 0; i < TOTAL_NUM_MOVIES; i++) {
             tableModel.addRow(new Object[0]);
-            Movie movie = movies.get(i);
-//            for (int j = 0; j < count; j++) {
-//                tableModel.setValueAt(movies.get(i), i, j);
-//
-//
-//            }
-//            tableModel.setValueAt(movie.title(), i, MovieEnum.TITLE.getValue());
-//            tableModel.setValueAt(movie.genres(), i, MovieEnum.GENRE.getValue());
-            }
-
+            Movie movie = filteredMovies.get(i);
+            tableModel.setValueAt(movie.title(), i, MovieEnum.TITLE.getValue());
+            tableModel.setValueAt(movie.genres(), i, MovieEnum.GENRE.getValue());
         }
-
-
+    }
 
 
 }
