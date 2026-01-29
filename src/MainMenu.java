@@ -12,7 +12,7 @@ import java.awt.event.KeyEvent;
 import java.util.*;
 import java.util.List;
 import java.util.function.Supplier;
-
+import java.util.stream.Collectors;
 
 public class MainMenu extends JFrame implements ActionListener {
     private final Database db = Database.getInstance();
@@ -159,9 +159,9 @@ public class MainMenu extends JFrame implements ActionListener {
         final int TOTAL_NUM_MOVIES = filteredMovies.size();
         for (int i = 0; i < TOTAL_NUM_MOVIES; i++) {
             tableModel.addRow(new Object[0]);
-            Movie movie = filteredMovies.get(i);
-            tableModel.setValueAt(movie.title(), i, MovieEnum.TITLE.getValue());
-            tableModel.setValueAt(movie.genres(), i, MovieEnum.GENRE.getValue());
+            final var movie = filteredMovies.get(i);
+            tableModel.setValueAt(movie.title(), i, MovieEnum.TITLE.ordinal());
+            tableModel.setValueAt(movie.genres(), i, MovieEnum.GENRE.ordinal());
         }
     }
 
