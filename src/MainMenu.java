@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public class MainMenu extends JFrame implements ActionListener {
-    private final Database db = Database.getInstance();
+    private final MovieDatabase db = MovieDatabase.getInstance();
     private List<Movie> movies = db.fetchMovies();
     private final SearchMovies search = new SearchMovies(movies);
 
@@ -90,7 +90,7 @@ public class MainMenu extends JFrame implements ActionListener {
     }
 
     private List<String> getGenres() {
-        List<String> genres = new ArrayList<>(db.getAvailableGenres());
+        List<String> genres = new ArrayList<>(db.fetchAvailableGenres());
         genres.addFirst("Any");
         return genres;
     }

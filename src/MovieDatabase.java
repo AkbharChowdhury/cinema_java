@@ -10,11 +10,11 @@ import java.util.*;
 
 import static models.Messages.printErrorMessage;
 
-public class Database {
-    private Database() {
+public class MovieDatabase {
+    private MovieDatabase() {
     }
 
-    private static volatile Database instance;
+    private static volatile MovieDatabase instance;
 
     private Connection getConnection() {
         Connection connection = null;
@@ -30,12 +30,12 @@ public class Database {
 
     }
 
-    public static Database getInstance() {
+    public static MovieDatabase getInstance() {
         try {
             if (instance == null) {
-                synchronized (Database.class) {
+                synchronized (MovieDatabase.class) {
                     if (instance == null) {
-                        instance = new Database();
+                        instance = new MovieDatabase();
                     }
                 }
             }
@@ -47,7 +47,7 @@ public class Database {
 
     }
 
-    public List<String> getAvailableGenres() {
+    public List<String> fetchAvailableGenres() {
         List<String> availableGenres = new ArrayList<>();
         try (var con = getConnection();
              var stmt = con.prepareStatement("SELECT genre FROM available_genres");
@@ -84,7 +84,7 @@ public class Database {
     }
 
 
-    public List<Genre> getAllGenres() {
+    public List<Genre> fetchAllGenres() {
         List<Genre> genres = new ArrayList<>();
         try (var con = getConnection();
              var stmt = con.createStatement();

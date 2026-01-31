@@ -16,14 +16,13 @@ import java.util.List;
 
 public class AddMovieForm extends JFrame implements ActionListener {
     private static MainMenu mainMenu;
-    private final Database db = Database.getInstance();
-    private final List<Genre> genres = Collections.unmodifiableList(db.getAllGenres());
+    private final MovieDatabase db = MovieDatabase.getInstance();
+    private final List<Genre> genres = Collections.unmodifiableList(db.fetchAllGenres());
     private final JTextField txtTitle = new JTextField(20);
     private final JButton btnAddMovie = new JButton("Add Movie");
     private final List<Checkbox> genreCheckboxes;
 
     public AddMovieForm(MainMenu mainMenuForm) {
-
         mainMenu = mainMenuForm;
         setTitle("Add Movie");
         JPanel panel = new JPanel();

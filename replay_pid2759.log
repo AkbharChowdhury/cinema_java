@@ -317,7 +317,7 @@ instanceKlass org/apache/commons/lang3/StringUtils
 instanceKlass java/util/TimSort
 instanceKlass java/util/Arrays$LegacyMergeSort
 instanceKlass  @bci java/util/stream/ReferencePipeline toArray ()[Ljava/lang/Object; 1 <appendix> argL0 ; # java/util/stream/ReferencePipeline$$Lambda+0x0000000127132550
-instanceKlass  @bci Database getAvailableGenres ()Ljava/util/List; 209 <appendix> argL0 ; # Database$$Lambda+0x0000000127113b10
+instanceKlass  @bci MovieDatabase getAvailableGenres ()Ljava/util/List; 209 <appendix> argL0 ; # MovieDatabase$$Lambda+0x0000000127113b10
 instanceKlass org/apache/commons/lang3/text/WordUtils
 instanceKlass java/util/stream/SortedOps
 instanceKlass java/sql/ParameterMetaData
@@ -1064,7 +1064,7 @@ instanceKlass java/sql/Driver
 instanceKlass java/nio/file/Paths
 instanceKlass ENVManager
 instanceKlass jdk/internal/module/ModulePatcher$PatchedModuleReader
-instanceKlass Database
+instanceKlass MovieDatabase
 instanceKlass java/awt/AWTEventMulticaster
 instanceKlass java/awt/event/TextListener
 instanceKlass java/awt/event/AdjustmentListener

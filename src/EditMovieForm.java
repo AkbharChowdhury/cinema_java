@@ -13,11 +13,11 @@ import java.util.function.Consumer;
 public class EditMovieForm extends JFrame implements ActionListener {
     private static MainMenu mainMenu;
     private final int MOVIE_ID = MovieInfo.getMovieID();
-    private final Database db = Database.getInstance();
+    private final MovieDatabase db = MovieDatabase.getInstance();
     private final List<String> originalSelectedGenres = db.fetchMovieGenres(MOVIE_ID);
 
     final String MOVIE_TITLE = db.fetchMovieTitle(MOVIE_ID);
-    private final List<Genre> genres = Collections.unmodifiableList(db.getAllGenres());
+    private final List<Genre> genres = Collections.unmodifiableList(db.fetchAllGenres());
     private final JTextField txtTitle = new JTextField(40);
     private final JButton btnUpdateMovie = new JButton("Update Movie");
     private final JButton btnUndoTitle = new JButton("Undo title");
