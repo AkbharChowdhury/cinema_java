@@ -6,7 +6,8 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public record Genre(int id, String name) {
-    private static final Function<List<Checkbox>, List<String>> filterSelectedGenres = (checkboxes) -> checkboxes.stream().filter(Checkbox::getState).map(Checkbox::getLabel).toList();
+    private static final Function<List<Checkbox>, List<String>> filterSelectedGenres = (checkboxes) ->
+            checkboxes.stream().filter(Checkbox::getState).map(Checkbox::getLabel).toList();
 
     public static BiFunction<List<Checkbox>, List<Genre>, List<Genre>> getSelectedGenres = (checkboxes, genres) ->
             genres.stream().filter(genre -> filterSelectedGenres.apply(checkboxes).stream()
