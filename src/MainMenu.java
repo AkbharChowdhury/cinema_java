@@ -12,11 +12,10 @@ import java.awt.event.KeyEvent;
 import java.util.*;
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public class MainMenu extends JFrame implements ActionListener {
     private final Database db = Database.getInstance();
-    private List<Movie> movies = db.getMovieList();
+    private List<Movie> movies = db.fetchMovies();
     private final SearchMovies search = new SearchMovies(movies);
 
     private final JButton btnAdd = new JButton("Add");
@@ -78,7 +77,6 @@ public class MainMenu extends JFrame implements ActionListener {
         comboBoxGenres.addActionListener(this);
         Arrays.stream(buttons).forEach(button -> button.addActionListener(this));
 
-
         populateList();
         setVisible(true);
 
@@ -99,6 +97,7 @@ public class MainMenu extends JFrame implements ActionListener {
 
     void main() {
         new MainMenu();
+
     }
 
 
@@ -148,7 +147,7 @@ public class MainMenu extends JFrame implements ActionListener {
         if (Messages.hasConfirmed.apply("Are you sure you want to remove this movie?")) {
             db.deleteRecord(TableName.MOVIE_TABLE, TableName.MOVIE_ID, getSelectedMovieID());
             tableModel.removeRow(table.getSelectedRow());
-            search.setList(db.getMovieList());
+            search.setList(db.fetchMovies());
         }
     }
 

@@ -14,9 +14,9 @@ public class EditMovieForm extends JFrame implements ActionListener {
     private static MainMenu mainMenu;
     private final int MOVIE_ID = MovieInfo.getMovieID();
     private final Database db = Database.getInstance();
-    private final List<String> originalSelectedGenres = db.getSelectedMovieGenres(MOVIE_ID);
+    private final List<String> originalSelectedGenres = db.fetchMovieGenres(MOVIE_ID);
 
-    final String MOVIE_TITLE = db.getMovieName(MOVIE_ID);
+    final String MOVIE_TITLE = db.fetchMovieTitle(MOVIE_ID);
     private final List<Genre> genres = Collections.unmodifiableList(db.getAllGenres());
     private final JTextField txtTitle = new JTextField(40);
     private final JButton btnUpdateMovie = new JButton("Update Movie");
@@ -105,7 +105,7 @@ public class EditMovieForm extends JFrame implements ActionListener {
         db.updateMovieTitle(txtTitle.getText().trim(), MOVIE_ID);
         db.deleteRecord("movie_genres", TableName.MOVIE_ID, MOVIE_ID);
         List<Integer> selectedGenreIds = Genre.getSelectedGenres.apply(genreCheckboxes, genres).stream().map(Genre::id).toList();
-        db.addMovieGenres(MOVIE_ID, selectedGenreIds);
+        db.addGenresToMovie(MOVIE_ID, selectedGenreIds);
         Messages.message("Movie updated");
         redirectToMainMenu();
     }

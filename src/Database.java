@@ -65,7 +65,7 @@ public class Database {
 
     }
 
-    public List<Movie> getMovieList() {
+    public List<Movie> fetchMovies() {
         List<Movie> movieList = new ArrayList<>();
         try (var con = getConnection();
              var stmt = con.createStatement();
@@ -103,11 +103,11 @@ public class Database {
 
     }
 
-    public String getMovieName(int id) {
+    public String fetchMovieTitle(int movieId) {
 
         try (var con = getConnection();
              var stmt = con.prepareStatement("SELECT title FROM movies WHERE movie_id = ?")) {
-            stmt.setInt(1, id);
+            stmt.setInt(1, movieId);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return rs.getString(1);
@@ -117,16 +117,16 @@ public class Database {
             printErrorMessage.accept(ex.getMessage());
         }
 
-        return MessageFormat.format("Error fetching movie name by movie id, Movie ID {0} does not exist", id);
+        return MessageFormat.format("Error fetching movie name by movie id, Movie ID {0} does not exist", movieId);
 
     }
 
 
-    public List<String> getSelectedMovieGenres(int id) {
+    public List<String> fetchMovieGenres(int movieId) {
         List<String> genres = new ArrayList<>();
         try (var con = getConnection();
              var stmt = con.prepareStatement("SELECT genre FROM fn_get_selected_movie_genres(?);")) {
-            stmt.setInt(1, id);
+            stmt.setInt(1, movieId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 genres.add(rs.getString(1));
@@ -149,12 +149,12 @@ public class Database {
         }
     }
 
-    public void addMovieGenres(int movieID, List<Integer> genreIds) {
+    public void addGenresToMovie(int movieId, List<Integer> genreIds) {
         try (Connection con = getConnection()) {
             for (int genreID : genreIds) {
                 var stmt = con.prepareStatement("INSERT INTO movie_genres(genre_id, movie_id) VALUES(?, ?)");
                 stmt.setInt(1, genreID);
-                stmt.setInt(2, movieID);
+                stmt.setInt(2, movieId);
                 stmt.executeUpdate();
             }
 
@@ -163,11 +163,11 @@ public class Database {
         }
     }
 
-    public void updateMovieTitle(String title, int movieID) {
+    public void updateMovieTitle(String newTitle, int movieId) {
         try (var con = getConnection()) {
             var stmt = con.prepareStatement("UPDATE movies SET title = ? WHERE movie_id = ?");
-            stmt.setString(1, title);
-            stmt.setInt(2, movieID);
+            stmt.setString(1, newTitle);
+            stmt.setInt(2, movieId);
             stmt.executeUpdate();
 
         } catch (Exception ex) {
@@ -175,10 +175,10 @@ public class Database {
         }
     }
 
-    public boolean addMovieAndGenres(String title, Set<Integer> genres) {
+    public boolean addMovieWithGenres(String title, Set<Integer> genreIds) {
         try (var con = getConnection()) {
             var stmt = con.prepareStatement("CALL pr_add_movie_and_genres(?, ?)");
-            Array genreArray = con.createArrayOf("INTEGER", new Object[]{genres.toArray(new Integer[0])});
+            Array genreArray = con.createArrayOf("INTEGER", new Object[]{genreIds.toArray(new Integer[0])});
             stmt.setString(1, title);
             stmt.setArray(2, genreArray);
             return stmt.executeUpdate() == -1;
