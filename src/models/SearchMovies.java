@@ -12,33 +12,21 @@ import java.util.function.Supplier;
 
 public final class SearchMovies {
 
-
     @Setter
     @Getter
     private List<Movie> list;
-
-
     @Setter
     private String title = "";
     @Setter
     private String genre = "Any";
-    private final Predicate<Movie> filterTitle = p -> StringUtils.containsIgnoreCase(p.title(), title);
-
-    private Predicate<Movie> filterGenre() {
-        return !"Any".equals(genre) ? p -> StringUtils.containsIgnoreCase(p.genres(), genre) : p -> true;
-    }
+    private final Predicate<Movie> filterTitle = movie -> StringUtils.containsIgnoreCase(movie.title(), title);
+    private final Predicate<Movie> filterGenre = movie -> "Any".equals(genre) || StringUtils.containsIgnoreCase(movie.genres(), genre);
 
     public SearchMovies(List<Movie> list) {
         this.list = list;
     }
 
-
-    public Supplier<List<Movie>> filterResults = () ->
-            list.stream()
-                    .filter(filterTitle)
-                    .filter(filterGenre())
-                    .toList();
-
+    public Supplier<List<Movie>> filterResults = () -> list.stream().filter(filterTitle.and(filterGenre)).toList();
 
     @Override
     public String toString() {

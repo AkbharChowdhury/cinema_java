@@ -10,30 +10,34 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
 public class AddMovieForm extends JFrame implements ActionListener {
     private static MainMenu mainMenu;
     private final Database db = Database.getInstance();
-    private final List<Genre> genres = db.getAllGenres();
+    private final List<Genre> genres = Collections.unmodifiableList(db.getAllGenres());
     private final JTextField txtTitle = new JTextField(20);
     private final JButton btnAddMovie = new JButton("Add Movie");
     private final List<Checkbox> genreCheckboxes;
 
     public AddMovieForm(MainMenu mainMenuForm) {
+
         mainMenu = mainMenuForm;
         setTitle("Add Movie");
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
         JPanel middle = new JPanel();
+        var g = new Genre(1,"a");
+//        Genre.getSelectedGenres()
 
         JPanel top = new JPanel();
         top.add(new JLabel("Movie"));
         top.add(txtTitle);
         middle.setLayout(new GridLayout(genres.size(), 2));
 
-        genreCheckboxes = genres.stream().map(genre -> new Checkbox(genre.name())).toList();
+        genreCheckboxes = Genre.createGenreCheckboxes.apply(genres);
         genreCheckboxes.forEach(middle::add);
 
         panel.add(top, BorderLayout.NORTH);
@@ -73,7 +77,7 @@ public class AddMovieForm extends JFrame implements ActionListener {
             return;
         }
 
-        List<Integer> selectedGenres = Genre.getSelectedGenres(genreCheckboxes, genres).stream().map(Genre::id).toList();
+        List<Integer> selectedGenres = Genre.getSelectedGenres.apply(genreCheckboxes, genres).stream().map(Genre::id).toList();
         boolean hasAddedMovie = db.addMovieAndGenres(txtTitle.getText().trim(), new HashSet<>(selectedGenres));
         if (!hasAddedMovie) {
             Messages.showErrorMessage("", "There was an error adding the movie");
