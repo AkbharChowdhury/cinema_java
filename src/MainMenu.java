@@ -45,6 +45,9 @@ public class MainMenu extends JFrame implements ActionListener {
 
 
     public MainMenu() {
+        btnAdd.setToolTipText("Add a new movie with the selected genres");
+        btnEdit.setToolTipText("Edit the selected movie");
+        btnRemove.setToolTipText("Remove the selected movie");
 
         tableProperties();
 
@@ -129,12 +132,12 @@ public class MainMenu extends JFrame implements ActionListener {
 
     private int getSelectedMovieID() {
         int selectedIndex = table.getSelectedRow();
-        movies = search.filterResults.get();
+        movies = search.filterMovies.get();
         return movies.get(selectedIndex).id();
     }
 
     private void showMovieRequiredMessage() {
-        Messages.showErrorMessage("Movie required!", "Please select a movie!");
+        Messages.showErrorMessage("No Selection", "Please select a movie");
     }
 
     private void removeMovie() {
@@ -154,7 +157,7 @@ public class MainMenu extends JFrame implements ActionListener {
 
     private void populateList() {
         ((DefaultTableModel) table.getModel()).setRowCount(0);
-        List<Movie> filteredMovies = search.filterResults.get();
+        List<Movie> filteredMovies = search.filterMovies.get();
         final int TOTAL_NUM_MOVIES = filteredMovies.size();
         for (int i = 0; i < TOTAL_NUM_MOVIES; i++) {
             tableModel.addRow(new Object[0]);

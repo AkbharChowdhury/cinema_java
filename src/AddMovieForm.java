@@ -23,6 +23,7 @@ public class AddMovieForm extends JFrame implements ActionListener {
     private final List<Checkbox> genreCheckboxes;
 
     public AddMovieForm(MainMenu mainMenuForm) {
+        btnAddMovie.setToolTipText("Add a new movie with the selected genres");
         mainMenu = mainMenuForm;
         setTitle("Add Movie");
         JPanel panel = new JPanel();
@@ -65,11 +66,11 @@ public class AddMovieForm extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         boolean hasSelectedGenre = Genre.hasSelectedGenre.apply(genreCheckboxes);
         if (txtTitle.getText().trim().isBlank()) {
-            Messages.showErrorMessage("", "Movie title is required");
+            Messages.showErrorMessage("Title is Empty", "Please enter a movie title");
             return;
         }
         if (!hasSelectedGenre) {
-            Messages.showErrorMessage("", "Please choose a genre");
+            Messages.showErrorMessage("Missing Genre", "Please select at least one genre");
             return;
         }
 

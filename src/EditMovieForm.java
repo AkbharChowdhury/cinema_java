@@ -26,6 +26,9 @@ public class EditMovieForm extends JFrame implements ActionListener {
     private final List<Checkbox> genreCheckboxes;
 
     public EditMovieForm(MainMenu mainMenuForm) {
+        btnUpdateMovie.setToolTipText("Save changes to the movie");
+        btnUndoGenre.setToolTipText("Undo changes to genres");
+        btnUndoTitle.setToolTipText("Undo changes to the title");
         mainMenu = mainMenuForm;
         txtTitle.setText(MOVIE_TITLE);
         setTitle("Edit Movie");
@@ -91,11 +94,12 @@ public class EditMovieForm extends JFrame implements ActionListener {
 
         boolean hasSelectedGenre = Genre.hasSelectedGenre.apply(genreCheckboxes);
         if (txtTitle.getText().trim().isBlank()) {
-            Messages.showErrorMessage("Title required!", "Movie title is required");
+            Messages.showErrorMessage("Title is Empty", "Please enter a movie title");
             return false;
         }
         if (!hasSelectedGenre) {
-            Messages.showErrorMessage("Genre required!", "Please choose a genre");
+            Messages.showErrorMessage("Missing Genre", "Please select at least one genre");
+
             return false;
         }
         return true;
