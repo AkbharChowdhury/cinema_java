@@ -10,12 +10,12 @@ public record Genre(int id, String name) {
     private static final Function<List<Checkbox>, List<String>> filterSelectedGenres = (checkboxes) ->
             checkboxes.stream().filter(Checkbox::getState).map(Checkbox::getLabel).toList();
 
-    private static final BiPredicate<String, Genre> filterLabel = (label, genre) -> label.equals(genre.name());
+    private static final BiPredicate<String, Genre> matchesLabel = (label, genre) -> label.equals(genre.name());
     public static BiFunction<List<Checkbox>, List<Genre>, List<Genre>> getSelectedGenres =
             (checkboxes, genres) ->
                     genres.stream()
                             .filter(genre -> filterSelectedGenres.apply(checkboxes).stream()
-                                    .anyMatch(label -> filterLabel.test(label, genre)))
+                                    .anyMatch(label -> matchesLabel.test(label, genre)))
                             .toList();
     public static Function<List<Checkbox>, Boolean> hasSelectedGenre = (checkboxes) ->
             checkboxes.stream()

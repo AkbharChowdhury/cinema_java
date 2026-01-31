@@ -28,11 +28,8 @@ public class AddMovieForm extends JFrame implements ActionListener {
         setTitle("Add Movie");
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
-        JPanel middle = new JPanel();
-        var g = new Genre(1,"a");
-//        Genre.getSelectedGenres()
-
         JPanel top = new JPanel();
+        JPanel middle = new JPanel();
         top.add(new JLabel("Movie"));
         top.add(txtTitle);
         middle.setLayout(new GridLayout(genres.size(), 2));

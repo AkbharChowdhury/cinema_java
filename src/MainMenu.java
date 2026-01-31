@@ -159,7 +159,7 @@ public class MainMenu extends JFrame implements ActionListener {
         final int TOTAL_NUM_MOVIES = filteredMovies.size();
         for (int i = 0; i < TOTAL_NUM_MOVIES; i++) {
             tableModel.addRow(new Object[0]);
-            final var movie = filteredMovies.get(i);
+            Movie movie = filteredMovies.get(i);
             tableModel.setValueAt(movie.title(), i, MovieEnum.TITLE.ordinal());
             tableModel.setValueAt(movie.genres(), i, MovieEnum.GENRE.ordinal());
         }

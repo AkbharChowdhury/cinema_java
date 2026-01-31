@@ -28,8 +28,4 @@ public final class SearchMovies {
 
     public Supplier<List<Movie>> filterResults = () -> list.stream().filter(filterTitle.and(filterGenre)).toList();
 
-    @Override
-    public String toString() {
-        return list.stream().toList().toString();
-    }
 }
