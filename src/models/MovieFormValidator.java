@@ -10,8 +10,9 @@ public class MovieFormValidator {
 
     }
 
-    public static boolean isMovieFormValid(JTextField txtTitle, List<Checkbox> genreCheckboxes) {
+    public static boolean isFormValid(JTextField txtTitle, List<Checkbox> genreCheckboxes) {
         boolean hasSelectedGenre = Genre.hasSelectedGenre.apply(genreCheckboxes);
+
         if (txtTitle.getText().trim().isBlank()) {
             Messages.showErrorMessage.accept("Title is Empty", "Please enter a movie title");
             return false;
@@ -21,5 +22,6 @@ public class MovieFormValidator {
             return false;
         }
         return true;
+
     }
 }

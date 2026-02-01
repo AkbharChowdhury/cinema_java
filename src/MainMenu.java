@@ -43,14 +43,15 @@ public class MainMenu extends JFrame implements ActionListener {
         List.of("Title", "Genres").forEach(tableModel::addColumn);
     }
 
-
-    public MainMenu() {
+    private void buttonToolTips() {
         btnAdd.setToolTipText("Add a new movie with the selected genres");
         btnEdit.setToolTipText("Edit the selected movie");
         btnRemove.setToolTipText("Remove the selected movie");
+    }
 
+    public MainMenu() {
+        buttonToolTips();
         tableProperties();
-
         comboBoxGenres.setModel(new DefaultComboBoxModel<>(new Vector<>(getGenres())));
         setResizable(true);
         setLayout(new BorderLayout());
@@ -67,10 +68,8 @@ public class MainMenu extends JFrame implements ActionListener {
 
         JPanel middle = new JPanel();
         middle.add(new JScrollPane(table));
-
         JPanel south = new JPanel();
         Arrays.stream(buttons).forEach(south::add);
-
 
         add(BorderLayout.NORTH, top);
         add(BorderLayout.CENTER, middle);
@@ -94,7 +93,7 @@ public class MainMenu extends JFrame implements ActionListener {
 
     private List<String> getGenres() {
         List<String> genres = new ArrayList<>(db.fetchAvailableGenres());
-        genres.addFirst("Any");
+        genres.addFirst(Genre.anyGenre.get());
         return genres;
     }
 

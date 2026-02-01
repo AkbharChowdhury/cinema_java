@@ -66,7 +66,7 @@ public class AddMovieForm extends JFrame implements ActionListener {
 
 
     private void handleAddMovie() {
-        if (!MovieFormValidator.isMovieFormValid(txtTitle, genreCheckboxes)) return;
+        if (!MovieFormValidator.isFormValid(txtTitle, genreCheckboxes)) return;
         List<Integer> selectedGenres = Genre.getSelectedGenres.apply(genreCheckboxes, genres).stream().map(Genre::id).toList();
         boolean hasAddedMovie = db.addMovieWithGenres(txtTitle.getText().trim(), new HashSet<>(selectedGenres));
         if (!hasAddedMovie) {

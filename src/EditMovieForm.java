@@ -79,7 +79,7 @@ public class EditMovieForm extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnUndoGenre) undoGenreSelection();
         if (e.getSource() == btnUpdateMovie) {
-            if (!MovieFormValidator.isMovieFormValid(txtTitle, genreCheckboxes)) return;
+            if (!MovieFormValidator.isFormValid(txtTitle, genreCheckboxes)) return;
             updateMovie();
         }
         if (e.getSource() == btnUndoTitle) txtTitle.setText(MOVIE_TITLE);
