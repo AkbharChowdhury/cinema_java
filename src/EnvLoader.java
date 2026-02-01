@@ -5,11 +5,11 @@ import java.nio.file.Paths;
 import java.util.Properties;
 
 
-public class ENVManager {
-    private ENVManager() {
+public class EnvLoader {
+    private EnvLoader() {
     }
 
-    public static Properties getENV() {
+    public static Properties load() {
         Properties props = new Properties();
         Path envFile = Paths.get("src/config.env");
         try (var inputStream = Files.newInputStream(envFile)) {

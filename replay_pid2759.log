@@ -1062,7 +1062,7 @@ instanceKlass java/sql/Wrapper
 instanceKlass org/postgresql/Driver
 instanceKlass java/sql/Driver
 instanceKlass java/nio/file/Paths
-instanceKlass ENVManager
+instanceKlass EnvLoader
 instanceKlass jdk/internal/module/ModulePatcher$PatchedModuleReader
 instanceKlass MovieDatabase
 instanceKlass java/awt/AWTEventMulticaster

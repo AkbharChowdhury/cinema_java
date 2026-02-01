@@ -148,7 +148,7 @@ public class MainMenu extends JFrame implements ActionListener {
         }
 
         if (Messages.hasConfirmed.apply("Are you sure you want to remove this movie?")) {
-            db.deleteRecord(TableName.MOVIE_TABLE, TableName.MOVIE_ID, getSelectedMovieID());
+            db.deleteRecord(MovieSchema.MOVIE_TABLE, MovieSchema.MOVIE_ID, getSelectedMovieID());
             tableModel.removeRow(table.getSelectedRow());
             search.setList(db.fetchMovies());
         }

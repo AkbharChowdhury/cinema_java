@@ -19,7 +19,7 @@ public class MovieDatabase {
     private Connection getConnection() {
         Connection connection = null;
         try {
-            Properties props = ENVManager.getENV();
+            Properties props = EnvLoader.load();
             final String DB_NAME = "cinema";
             Class.forName("org.postgresql.Driver");
             connection = DriverManager.getConnection(String.format("jdbc:postgresql://localhost:5432/%s", DB_NAME), props.getProperty("USERNAME"), props.getProperty("PASSWORD"));
@@ -72,7 +72,7 @@ public class MovieDatabase {
              var rs = stmt.executeQuery("SELECT movie_id, title, genres  FROM view_all_movies")
         ) {
             while (rs.next()) {
-                movieList.add(new Movie(rs.getInt(TableName.MOVIE_ID), rs.getString(TableName.MOVIE_TITLE), rs.getString(TableName.GENRES)));
+                movieList.add(new Movie(rs.getInt(MovieSchema.MOVIE_ID), rs.getString(MovieSchema.MOVIE_TITLE), rs.getString(MovieSchema.GENRES)));
             }
 
         } catch (Exception ex) {
@@ -92,7 +92,7 @@ public class MovieDatabase {
         ) {
 
             while (rs.next()) {
-                genres.add(new Genre(rs.getInt(TableName.GENRE_ID), rs.getString(TableName.GENRE)));
+                genres.add(new Genre(rs.getInt(MovieSchema.GENRE_ID), rs.getString(MovieSchema.GENRE)));
             }
 
         } catch (Exception ex) {
