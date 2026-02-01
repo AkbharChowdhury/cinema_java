@@ -1,8 +1,5 @@
 
-import models.Genre;
-import models.Messages;
-import models.MyButton;
-import models.MyWindow;
+import models.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -64,25 +61,22 @@ public class AddMovieForm extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        boolean hasSelectedGenre = Genre.hasSelectedGenre.apply(genreCheckboxes);
-        if (txtTitle.getText().trim().isBlank()) {
-            Messages.showErrorMessage("Title is Empty", "Please enter a movie title");
-            return;
-        }
-        if (!hasSelectedGenre) {
-            Messages.showErrorMessage("Missing Genre", "Please select at least one genre");
-            return;
-        }
+        handleAddMovie();
+    }
 
+
+    private void handleAddMovie() {
+        if (!MovieFormValidator.isMovieFormValid(txtTitle, genreCheckboxes)) return;
         List<Integer> selectedGenres = Genre.getSelectedGenres.apply(genreCheckboxes, genres).stream().map(Genre::id).toList();
         boolean hasAddedMovie = db.addMovieWithGenres(txtTitle.getText().trim(), new HashSet<>(selectedGenres));
         if (!hasAddedMovie) {
-            Messages.showErrorMessage("", "There was an error adding the movie");
+            Messages.showErrorMessage.accept("", "There was an error adding the movie");
             return;
         }
 
         clearForm();
-        Messages.message("Movie Added");
+        Messages.message.accept("Movie Added");
+
         redirectToMainMenu();
     }
 

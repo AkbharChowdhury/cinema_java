@@ -69,48 +69,30 @@ public class EditMovieForm extends JFrame implements ActionListener {
     }
 
     private final Consumer<List<Checkbox>> resetGenreSelection = (genreCheckboxes) -> genreCheckboxes.forEach(checkbox -> checkbox.setState(false));
+
     private final Consumer<List<Checkbox>> showOriginalSelectedGenres = (genreCheckboxes) ->
             genreCheckboxes.stream()
-                    .filter(checkbox -> originalSelectedGenres.stream()
-                            .anyMatch(label -> label.equals(checkbox.getLabel())))
+                    .filter(checkbox -> originalSelectedGenres.stream().anyMatch(label -> label.equals(checkbox.getLabel())))
                     .forEach(checkbox -> checkbox.setState(true));
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnUndoGenre) undoGenreSelection();
-
         if (e.getSource() == btnUpdateMovie) {
-            if (!isFormValid()) return;
-            updateGenres();
+            if (!MovieFormValidator.isMovieFormValid(txtTitle, genreCheckboxes)) return;
+            updateMovie();
         }
+        if (e.getSource() == btnUndoTitle) txtTitle.setText(MOVIE_TITLE);
 
-        if (e.getSource() == btnUndoTitle) {
-            txtTitle.setText("");
-            txtTitle.setText(MOVIE_TITLE);
-        }
     }
 
-    private boolean isFormValid() {
 
-        boolean hasSelectedGenre = Genre.hasSelectedGenre.apply(genreCheckboxes);
-        if (txtTitle.getText().trim().isBlank()) {
-            Messages.showErrorMessage("Title is Empty", "Please enter a movie title");
-            return false;
-        }
-        if (!hasSelectedGenre) {
-            Messages.showErrorMessage("Missing Genre", "Please select at least one genre");
-
-            return false;
-        }
-        return true;
-    }
-
-    private void updateGenres() {
+    private void updateMovie() {
         db.updateMovieTitle(txtTitle.getText().trim(), MOVIE_ID);
         db.deleteRecord("movie_genres", MovieSchema.MOVIE_ID, MOVIE_ID);
         List<Integer> selectedGenreIds = Genre.getSelectedGenres.apply(genreCheckboxes, genres).stream().map(Genre::id).toList();
         db.addGenresToMovie(MOVIE_ID, selectedGenreIds);
-        Messages.message("Movie updated");
+        Messages.message.accept("Movie updated");
         redirectToMainMenu();
     }
 

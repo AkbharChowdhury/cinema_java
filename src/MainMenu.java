@@ -137,7 +137,7 @@ public class MainMenu extends JFrame implements ActionListener {
     }
 
     private void showMovieRequiredMessage() {
-        Messages.showErrorMessage("No Selection", "Please select a movie");
+        Messages.showErrorMessage.accept("No Selection", "Please select a movie");
     }
 
     private void removeMovie() {

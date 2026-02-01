@@ -163,16 +163,17 @@ public class MovieDatabase {
         }
     }
 
-    public void updateMovieTitle(String newTitle, int movieId) {
+    public boolean updateMovieTitle(String newTitle, int movieId) {
         try (var con = getConnection()) {
             var stmt = con.prepareStatement("UPDATE movies SET title = ? WHERE movie_id = ?");
             stmt.setString(1, newTitle);
             stmt.setInt(2, movieId);
-            stmt.executeUpdate();
+            return stmt.executeUpdate() != 0;
 
         } catch (Exception ex) {
             printErrorMessage.accept(ex.getMessage());
         }
+        return false;
     }
 
     public boolean addMovieWithGenres(String title, Set<Integer> genreIds) {
