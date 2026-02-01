@@ -26,7 +26,7 @@ public class MainMenu extends JFrame implements ActionListener {
     private final JTextField txtTitle = new JTextField(40);
     private final JComboBox<String> comboBoxGenres = new JComboBox<>();
     private final JTable table = new JTable();
-    private final DefaultTableModel tableModel = new DefaultTableModel() {
+    private  DefaultTableModel tableModel = new DefaultTableModel() {
 
         @Override
         public boolean isCellEditable(int row, int column) {
@@ -36,11 +36,23 @@ public class MainMenu extends JFrame implements ActionListener {
 
 
     private void tableProperties() {
+//        table.getColumnModel().getColumn(0).setPreferredWidth(1);
+
 
         table.setModel(tableModel);
+//        tableModel.getco
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        table.setPreferredSize(new Dimension(700, 600));
+//        table.setPreferredSize(new Dimension(100, 600));
         List.of("Title", "Genres").forEach(tableModel::addColumn);
+        tableModel = (DefaultTableModel)table.getModel();
+//        table.getColumnModel().getColumn(0).setPreferredWidth(7);
+//        table.getColumnModel().getColumn(1).setPreferredWidth(5);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+
+
+
+
+
     }
 
     private void buttonToolTips() {
@@ -125,11 +137,11 @@ public class MainMenu extends JFrame implements ActionListener {
             showMovieRequiredMessage();
             return;
         }
-        MovieInfo.setMovieID(getSelectedMovieID());
+        MovieInfo.setMovieID(getSelectedMovieId());
         new EditMovieForm(MainMenu.this);
     }
 
-    private int getSelectedMovieID() {
+    private int getSelectedMovieId() {
         int selectedIndex = table.getSelectedRow();
         movies = search.filterMovies.get();
         return movies.get(selectedIndex).id();
@@ -147,7 +159,7 @@ public class MainMenu extends JFrame implements ActionListener {
         }
 
         if (Messages.hasConfirmed.apply("Are you sure you want to remove this movie?")) {
-            db.deleteRecord(MovieSchema.MOVIE_TABLE, MovieSchema.MOVIE_ID, getSelectedMovieID());
+            db.deleteRecord(MovieSchema.MOVIE_TABLE, MovieSchema.MOVIE_ID, getSelectedMovieId());
             tableModel.removeRow(table.getSelectedRow());
             search.setList(db.fetchMovies());
         }
