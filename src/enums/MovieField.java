@@ -1,6 +1,6 @@
 package enums;
 
-public enum MovieEnum {
+public enum MovieField {
     TITLE,
     GENRE
 }

@@ -1,4 +1,4 @@
-import enums.MovieEnum;
+import enums.MovieField;
 
 import models.*;
 
@@ -162,8 +162,8 @@ public class MainMenu extends JFrame implements ActionListener {
         for (int i = 0; i < TOTAL_NUM_MOVIES; i++) {
             tableModel.addRow(new Object[0]);
             Movie movie = filteredMovies.get(i);
-            tableModel.setValueAt(movie.title(), i, MovieEnum.TITLE.ordinal());
-            tableModel.setValueAt(movie.genres(), i, MovieEnum.GENRE.ordinal());
+            tableModel.setValueAt(movie.title(), i, MovieField.TITLE.ordinal());
+            tableModel.setValueAt(movie.genres(), i, MovieField.GENRE.ordinal());
         }
     }
 
