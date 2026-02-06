@@ -1,7 +1,6 @@
 package models;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -13,8 +12,9 @@ public final class SearchMovies {
     @Setter
     @Getter
     private List<Movie> list;
+
     @Setter
-    private String title = "";
+    public String title = "";
     @Setter
     private String genre = Genre.anyGenre.get();
     private final Predicate<Movie> filterByTitle = movie -> StringUtils.containsIgnoreCase(movie.title(), title);

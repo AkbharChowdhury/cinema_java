@@ -36,23 +36,12 @@ public class MainMenu extends JFrame implements ActionListener {
 
 
     private void tableProperties() {
-//        table.getColumnModel().getColumn(0).setPreferredWidth(1);
-
-
         table.setModel(tableModel);
-//        tableModel.getco
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//        table.setPreferredSize(new Dimension(100, 600));
         List.of("Title", "Genres").forEach(tableModel::addColumn);
         tableModel = (DefaultTableModel)table.getModel();
-//        table.getColumnModel().getColumn(0).setPreferredWidth(7);
-//        table.getColumnModel().getColumn(1).setPreferredWidth(5);
+
         table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-
-
-
-
-
     }
 
     private void buttonToolTips() {

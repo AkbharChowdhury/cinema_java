@@ -48,14 +48,14 @@ CREATE UNIQUE INDEX genre_unique_idx on genres (LOWER(genre));
 
 
 create or replace view view_all_movies as
-select
+SELECT
     m.movie_id,
     m.title,
     string_agg(DISTINCT g.genre, ' | ') genres
-from movie_genres
-         natural join movies m
-         natural join genres g
-group by m.movie_id;
+FROM movie_genres
+         NATURAL JOIN movies m
+         NATURAL JOIN genres g
+GROUP BY m.movie_id;
 
 
 
