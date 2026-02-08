@@ -20,8 +20,9 @@ public class AddMovieForm extends JFrame implements ActionListener {
     private final List<Checkbox> genreCheckboxes;
 
     public AddMovieForm(MainMenu mainMenuForm) {
-        btnAddMovie.setToolTipText("Add a new movie with the selected genres");
         mainMenu = mainMenuForm;
+        btnAddMovie.setToolTipText("Add a new movie with the selected genres");
+
         setTitle("Add Movie");
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
@@ -45,18 +46,20 @@ public class AddMovieForm extends JFrame implements ActionListener {
         MyButton.applyHandCursor.accept(new JButton[]{btnAddMovie});
 
 
-        autofocus();
+        applyAutofocus();
         setVisible(true);
 
     }
 
 
-    private void autofocus() {
+    private void applyAutofocus() {
         addWindowListener(new WindowAdapter() {
+            @Override
             public void windowOpened(WindowEvent e) {
                 txtTitle.requestFocus();
             }
         });
+
     }
 
     @Override
