@@ -53,6 +53,7 @@ public class AddMovieForm extends JFrame implements ActionListener {
     }
 
     private void applyAutofocus() {
+
         EventQueue.invokeLater(txtTitle::requestFocus);
     }
 
