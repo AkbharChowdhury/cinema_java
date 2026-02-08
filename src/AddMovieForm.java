@@ -10,6 +10,7 @@ import java.awt.event.WindowEvent;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class AddMovieForm extends JFrame implements ActionListener {
     private static MainMenu mainMenu;
@@ -51,15 +52,8 @@ public class AddMovieForm extends JFrame implements ActionListener {
 
     }
 
-
     private void applyAutofocus() {
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowOpened(WindowEvent e) {
-                txtTitle.requestFocus();
-            }
-        });
-
+        EventQueue.invokeLater(txtTitle::requestFocus);
     }
 
     @Override
