@@ -59,6 +59,7 @@ public class EditMovieForm extends JFrame implements ActionListener {
         showOriginalSelectedGenres.accept(genreCheckboxes);
 
         setVisible(true);
+
     }
 
 
@@ -82,7 +83,9 @@ public class EditMovieForm extends JFrame implements ActionListener {
             if (!MovieFormValidator.isFormValid(txtTitle, genreCheckboxes)) return;
             updateMovie();
         }
-        if (e.getSource() == btnUndoTitle) txtTitle.setText(MOVIE_TITLE);
+        if (e.getSource() == btnUndoTitle) {
+            txtTitle.setText(MOVIE_TITLE);
+        }
 
     }
 
