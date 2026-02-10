@@ -1,5 +1,3 @@
-import enums.MovieRow;
-
 import models.*;
 
 import javax.swing.*;
@@ -156,15 +154,16 @@ public class MainMenu extends JFrame implements ActionListener {
 
 
     private void populateList() {
-        ((DefaultTableModel) table.getModel()).setRowCount(0);
-        List<Movie> filteredMovies = search.filterMovies.get();
-        final int TOTAL_NUM_MOVIES = filteredMovies.size();
-        for (int i = 0; i < TOTAL_NUM_MOVIES; i++) {
-            tableModel.addRow(new Object[0]);
-            var movie = filteredMovies.get(i);
-            tableModel.setValueAt(movie.title(), i, MovieRow.TITLE.ordinal());
-            tableModel.setValueAt(movie.genres(), i, MovieRow.GENRE.ordinal());
-        }
+        tableModel.setRowCount(0);
+        var filteredMovies = search.filterMovies.get();
+        filteredMovies.forEach(this::addMovieRow);
+    }
+
+    private void addMovieRow(Movie movie) {
+        tableModel.addRow(new Object[]{
+                movie.title(),
+                movie.genres()
+        });
     }
 
 
