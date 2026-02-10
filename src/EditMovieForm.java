@@ -89,8 +89,6 @@ public class EditMovieForm extends JFrame implements ActionListener {
         Runnable action = buttonActions.get(sourceButton);
         if (action != null) action.run();
 
-
-
     }
 
     private void updateMovieAction() {
