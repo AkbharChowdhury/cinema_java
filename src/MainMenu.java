@@ -31,7 +31,12 @@ public class MainMenu extends JFrame implements ActionListener {
             return false;
         }
     };
-
+    private final Map<Object, Runnable> componentActions = Map.of(
+            btnAdd, () -> new AddMovieForm(this),
+            btnEdit, this::editMovieAction,
+            btnRemove, this::removeMovieAction,
+            comboBoxGenres, this::genreAction
+    );
 
     private void tableProperties() {
         table.setModel(tableModel);
@@ -105,12 +110,8 @@ public class MainMenu extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         MyWindow.setHasOpenMainMenu(true);
-        Object source = e.getSource();
-        if (source == btnAdd) new AddMovieForm(this);
-        if (source == btnEdit) editMovieAction();
-        if (source == btnRemove) removeMovieAction();
-        if (source == comboBoxGenres) genreAction();
-
+        Runnable action = componentActions.get(e.getSource());
+        if (action != null) action.run();
     }
 
     private void genreAction() {
@@ -118,7 +119,7 @@ public class MainMenu extends JFrame implements ActionListener {
         populateList();
     }
 
-    void editMovieAction() {
+    private void editMovieAction() {
         if (isSelectionRequired.get()) {
             showMovieRequiredMessage();
             return;
@@ -141,11 +142,6 @@ public class MainMenu extends JFrame implements ActionListener {
 
 
     private void editMovie(int movieId) {
-
-//        if (isSelectionRequired.get()) {
-//            showMovieRequiredMessage();
-//            return;
-//        }
         MovieInfo.setMovieID(movieId);
         new EditMovieForm(MainMenu.this);
     }
