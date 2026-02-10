@@ -138,18 +138,30 @@ public class MainMenu extends JFrame implements ActionListener {
         Messages.showErrorMessage.accept("No Selection", "Please select a movie");
     }
 
-    private void removeMovie() {
 
+    private void removeMovie() {
         if (isSelectionRequired.get()) {
             showMovieRequiredMessage();
             return;
         }
 
-        if (Messages.hasConfirmed.apply("Are you sure you want to remove this movie?")) {
-            db.deleteRecord(MovieSchema.MOVIE_TABLE, MovieSchema.MOVIE_ID, getSelectedMovieId());
-            tableModel.removeRow(table.getSelectedRow());
-            search.setList(db.fetchMovies());
+        if (!Messages.hasConfirmed.apply("Are you sure you want to remove this movie?")) {
+            return;
         }
+
+        int movieId = getSelectedMovieId();
+        deleteMovie(movieId);
+        refreshMovieList();
+    }
+
+    private void deleteMovie(int id) {
+        db.deleteRecord(MovieSchema.MOVIE_TABLE, MovieSchema.MOVIE_ID, id);
+        tableModel.removeRow(table.getSelectedRow());
+    }
+
+    private void refreshMovieList() {
+        search.setList(db.fetchMovies());
+        populateList();
     }
 
 
