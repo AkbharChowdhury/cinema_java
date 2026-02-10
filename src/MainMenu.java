@@ -155,8 +155,8 @@ public class MainMenu extends JFrame implements ActionListener {
 
     private void populateList() {
         tableModel.setRowCount(0);
-        var filteredMovies = search.filterMovies.get();
-        filteredMovies.forEach(this::addMovieRow);
+        search.filterMovies.get().forEach(this::addMovieRow);
+
     }
 
     private void addMovieRow(Movie movie) {
