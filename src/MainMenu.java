@@ -106,9 +106,9 @@ public class MainMenu extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         MyWindow.setHasOpenMainMenu(true);
         Object source = e.getSource();
-        switch (e.getSource()) {
-            case btnAdd -> new AddMovieForm(this);
-        }
+//        switch (e.getSource()) {
+//            case btnAdd -> new AddMovieForm(this);
+//        }
         if (source == btnAdd) new AddMovieForm(this);
         if (source == btnEdit) editMovie(getSelectedMovieId());
         if (source == btnRemove) removeMovie(getSelectedMovieId());

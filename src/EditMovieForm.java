@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class EditMovieForm extends JFrame implements ActionListener {
@@ -78,15 +79,23 @@ public class EditMovieForm extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == btnUndoGenre) undoGenreSelection();
-        if (e.getSource() == btnUpdateMovie) {
-            if (!MovieFormValidator.isFormValid(txtTitle, genreCheckboxes)) return;
-            updateMovie();
-        }
-        if (e.getSource() == btnUndoTitle) {
-            txtTitle.setText(MOVIE_TITLE);
-        }
+        Map<JButton, Runnable> buttonActions = Map.of(
+                btnUndoGenre, this::undoGenreSelection,
+                btnUpdateMovie, this::updateMovieAction,
+                btnUndoTitle, () -> txtTitle.setText(MOVIE_TITLE)
+        );
 
+        JButton sourceButton = (JButton) e.getSource();
+        Runnable action = buttonActions.get(sourceButton);
+        if (action != null) action.run();
+
+
+
+    }
+
+    private void updateMovieAction() {
+        if (!MovieFormValidator.isFormValid(txtTitle, genreCheckboxes)) return;
+        updateMovie();
     }
 
 
