@@ -105,10 +105,11 @@ public class MainMenu extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         MyWindow.setHasOpenMainMenu(true);
-        if (e.getSource() == btnEdit) editMovie();
-        if (e.getSource() == btnAdd) new AddMovieForm(this);
-        if (e.getSource() == btnRemove) removeMovie();
-        if (e.getSource() == comboBoxGenres) {
+        Object source = e.getSource();
+        if (source == btnAdd) new AddMovieForm(this);
+        if (source == btnEdit) editMovie(getSelectedMovieId());
+        if (source == btnRemove) removeMovie(getSelectedMovieId());
+        if (source == comboBoxGenres) {
             search.setGenre(comboBoxGenres.getSelectedItem().toString());
             populateList();
         }
@@ -118,13 +119,13 @@ public class MainMenu extends JFrame implements ActionListener {
     private final Supplier<Boolean> isSelectionRequired = () -> table.getSelectedRow() == -1;
 
 
-    private void editMovie() {
+    private void editMovie(int movieId) {
 
         if (isSelectionRequired.get()) {
             showMovieRequiredMessage();
             return;
         }
-        MovieInfo.setMovieID(getSelectedMovieId());
+        MovieInfo.setMovieID(movieId);
         new EditMovieForm(MainMenu.this);
     }
 
@@ -139,17 +140,15 @@ public class MainMenu extends JFrame implements ActionListener {
     }
 
 
-    private void removeMovie() {
+    private void removeMovie(int movieId) {
         if (isSelectionRequired.get()) {
             showMovieRequiredMessage();
             return;
         }
 
-        if (!Messages.hasConfirmed.apply("Are you sure you want to remove this movie?")) {
-            return;
-        }
+        if (!Messages.hasConfirmed.apply("Are you sure you want to remove this movie?")) return;
 
-        int movieId = getSelectedMovieId();
+
         deleteMovie(movieId);
         refreshMovieList();
     }
