@@ -1,6 +1,9 @@
 package models;
 
 import javax.swing.*;
+import java.awt.*;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class MyWindow {
 
@@ -14,8 +17,11 @@ public class MyWindow {
     public static boolean hasOpenMainMenu() {
         return hasOpenMainMenu;
     }
-    public static int getCloseOperation(){
+
+    public static int getCloseOperation() {
         return hasOpenMainMenu ? JFrame.DISPOSE_ON_CLOSE : JFrame.EXIT_ON_CLOSE;
     }
+
+    public static Consumer<Component> applyAutofocus = (c) -> EventQueue.invokeLater(c::requestFocus);
 
 }

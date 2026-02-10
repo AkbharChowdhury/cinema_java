@@ -21,6 +21,7 @@ public class AddMovieForm extends JFrame implements ActionListener {
     private final List<Checkbox> genreCheckboxes;
 
     public AddMovieForm(MainMenu mainMenuForm) {
+
         mainMenu = mainMenuForm;
         btnAddMovie.setToolTipText("Add a new movie with the selected genres");
 
@@ -45,17 +46,11 @@ public class AddMovieForm extends JFrame implements ActionListener {
         setSize(400, 400);
         btnAddMovie.addActionListener(this);
         MyButton.applyHandCursor.accept(new JButton[]{btnAddMovie});
-
-
-        applyAutofocus();
+        MyWindow.applyAutofocus.accept(txtTitle);
         setVisible(true);
 
     }
 
-    private void applyAutofocus() {
-
-        EventQueue.invokeLater(txtTitle::requestFocus);
-    }
 
     @Override
     public void actionPerformed(ActionEvent e) {

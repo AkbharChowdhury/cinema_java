@@ -26,7 +26,7 @@ public class MainMenu extends JFrame implements ActionListener {
     private final JTextField txtTitle = new JTextField(40);
     private final JComboBox<String> comboBoxGenres = new JComboBox<>();
     private final JTable table = new JTable();
-    private  DefaultTableModel tableModel = new DefaultTableModel() {
+    private DefaultTableModel tableModel = new DefaultTableModel() {
 
         @Override
         public boolean isCellEditable(int row, int column) {
@@ -39,7 +39,7 @@ public class MainMenu extends JFrame implements ActionListener {
         table.setModel(tableModel);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         List.of("Title", "Genres").forEach(tableModel::addColumn);
-        tableModel = (DefaultTableModel)table.getModel();
+        tableModel = (DefaultTableModel) table.getModel();
 
         table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
     }
@@ -161,7 +161,7 @@ public class MainMenu extends JFrame implements ActionListener {
         final int TOTAL_NUM_MOVIES = filteredMovies.size();
         for (int i = 0; i < TOTAL_NUM_MOVIES; i++) {
             tableModel.addRow(new Object[0]);
-            Movie movie = filteredMovies.get(i);
+            var movie = filteredMovies.get(i);
             tableModel.setValueAt(movie.title(), i, MovieRow.TITLE.ordinal());
             tableModel.setValueAt(movie.genres(), i, MovieRow.GENRE.ordinal());
         }
