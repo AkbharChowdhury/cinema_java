@@ -1,4 +1,3 @@
-
 import models.*;
 
 import javax.swing.*;
@@ -12,11 +11,11 @@ public class AddMovieForm extends JFrame {
     private final MovieDatabase db = MovieDatabase.getInstance();
     private final List<Genre> genres = Collections.unmodifiableList(db.fetchAllGenres());
     private final JTextField txtTitle = new JTextField(20);
-    private final JButton btnAddMovie = ButtonFactory.createButton("Add Movie", _ -> handle());
+    private final JButton btnAddMovie = ButtonFactory.createButton("Add Movie", _ -> handleAddMovie());
     private final List<Checkbox> genreCheckboxes;
-    private void handle(){
-        WindowUtils.openNewFrame(this, MainMenu::new);
-    }
+//    private void handle(){
+//        WindowUtils.openNewFrame(this, MainMenu::new);
+//    }
     public AddMovieForm(MainMenu mainMenuForm) {
         mainMenu = mainMenuForm;
 
@@ -57,14 +56,11 @@ public class AddMovieForm extends JFrame {
 
         clearForm();
         Messages.message.accept("Movie Added");
-        redirectToMainMenu();
+//        redirectToMainMenu();
+        WindowUtils.openMainMenu(this, mainMenu);
     }
 
-    private void redirectToMainMenu() {
-        if (mainMenu != null) mainMenu.dispose();
-        this.dispose();
-        new MainMenu();
-    }
+
 
     private void clearForm() {
         txtTitle.setText("");
