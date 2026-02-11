@@ -5,10 +5,8 @@ import javax.swing.JFrame;
 public class WindowUtils {
 
     private static boolean hasOpenMainMenu;
-
-
-    public static void setHasOpenMainMenu(boolean hasOpenMainMenu) {
-        WindowUtils.hasOpenMainMenu = hasOpenMainMenu;
+    public static void setHasOpenMainMenu(boolean open) {
+        hasOpenMainMenu = open;
     }
 
     public static int getCloseOperation() {
