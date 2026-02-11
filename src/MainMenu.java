@@ -32,7 +32,7 @@ public class MainMenu extends JFrame implements ActionListener {
         }
     };
     private final Map<Object, Runnable> componentActions = Map.of(
-            btnAdd, () -> new AddMovieForm(this),
+            btnAdd, () -> new AddMovieForm(this).setVisible(true),
             btnEdit, this::editMovieAction,
             btnRemove, this::removeMovieAction,
             comboBoxGenres, this::genreAction
@@ -84,7 +84,6 @@ public class MainMenu extends JFrame implements ActionListener {
         buttons.forEach(button -> button.addActionListener(this));
 
         populateList();
-        setVisible(true);
 
         txtTitle.addKeyListener(new KeyAdapter() {
             @Override
@@ -102,14 +101,14 @@ public class MainMenu extends JFrame implements ActionListener {
     }
 
     void main() {
-//        new MainMenu();
+        new MainMenu().setVisible(true);
 
     }
 
 
     @Override
     public void actionPerformed(ActionEvent e) {
-//        WindowUtils.setHasOpenMainMenu(true);
+        WindowUtils.setHasOpenMainMenu(true);
         var source = e.getSource();
         Runnable action = componentActions.get(source);
         if (action != null) action.run();
@@ -144,7 +143,7 @@ public class MainMenu extends JFrame implements ActionListener {
 
     private void editMovie(int movieId) {
         MovieInfo.setMovieID(movieId);
-        new EditMovieForm(MainMenu.this);
+        new EditMovieForm(MainMenu.this).setVisible(true);
     }
 
     private int getSelectedMovieId() {
@@ -194,6 +193,8 @@ public class MainMenu extends JFrame implements ActionListener {
                 movie.genres()
         });
     }
+
+
 
 
 }

@@ -36,9 +36,14 @@ public class WindowUtils {
      * @param currentFrame The JFrame that should be closed
      */
     public static void openMainMenu(JFrame currentFrame, JFrame mainMenuFrame) {
+        // Close existing main menu if it exists
         if (mainMenuFrame != null) mainMenuFrame.dispose();
-        currentFrame.dispose();
+
+        // Close the current frame
+        if (currentFrame != null) currentFrame.dispose();
+
         new MainMenu();
     }
+
 
 }

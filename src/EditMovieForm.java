@@ -52,8 +52,6 @@ public class EditMovieForm extends JFrame {
 
         showOriginalSelectedGenres.accept(genreCheckboxes);
 
-        setVisible(true);
-
     }
 
 

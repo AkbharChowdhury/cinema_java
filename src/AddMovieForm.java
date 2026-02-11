@@ -38,7 +38,6 @@ public class AddMovieForm extends JFrame {
         setDefaultCloseOperation(WindowUtils.getCloseOperation());
         setSize(400, 400);
         WindowUtils.applyAutofocus.accept(txtTitle);
-        setVisible(true);
 
     }
 
