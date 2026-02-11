@@ -24,11 +24,11 @@ public class WindowUtils {
     public static void openMainMenu(JFrame currentFrame, JFrame mainMenuFrame) {
         // Close existing main menu if it exists
         if (mainMenuFrame != null) mainMenuFrame.dispose();
-
         // Close the current frame
-        if (currentFrame != null) currentFrame.dispose();
-
+        currentFrame.dispose();
         new MainMenu();
+
+
     }
 
 

@@ -92,6 +92,7 @@ public class MainMenu extends JFrame implements ActionListener {
                 populateList();
             }
         });
+        setVisible(true);
     }
 
     private List<String> getGenres() {
@@ -101,7 +102,9 @@ public class MainMenu extends JFrame implements ActionListener {
     }
 
     void main() {
-        new MainMenu().setVisible(true);
+//        new MainMenu();
+
+
 
     }
 

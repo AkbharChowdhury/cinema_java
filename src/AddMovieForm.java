@@ -57,7 +57,7 @@ public class AddMovieForm extends JFrame {
 //        redirectToMainMenu();
         WindowUtils.openMainMenu(this, mainMenu);
     }
-
+//
 //    private void redirectToMainMenu() {
 //        if (mainMenu != null) mainMenu.dispose();
 //        dispose();
@@ -73,7 +73,7 @@ public class AddMovieForm extends JFrame {
 
 
     static void main() {
-        new AddMovieForm(mainMenu);
+        new AddMovieForm(mainMenu).setVisible(true);
     }
 
 }
