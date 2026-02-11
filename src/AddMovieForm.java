@@ -45,7 +45,7 @@ public class AddMovieForm extends JFrame implements ActionListener {
         setDefaultCloseOperation(MyWindow.getCloseOperation());
         setSize(400, 400);
         btnAddMovie.addActionListener(this);
-        MyButton.applyHandCursor.accept(new JButton[]{btnAddMovie});
+        MyButton.applyHandCursor.accept(List.of(btnAddMovie));
         MyWindow.applyAutofocus.accept(txtTitle);
         setVisible(true);
 

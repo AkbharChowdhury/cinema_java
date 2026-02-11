@@ -19,7 +19,7 @@ public class MainMenu extends JFrame implements ActionListener {
     private final JButton btnAdd = new JButton("Add");
     private final JButton btnEdit = new JButton("Edit");
     private final JButton btnRemove = new JButton("Remove");
-    private final JButton[] buttons = {btnAdd, btnEdit, btnRemove};
+    private final List<JButton> buttons = List.of(btnAdd, btnEdit, btnRemove);
 
     private final JTextField txtTitle = new JTextField(40);
     private final JComboBox<String> comboBoxGenres = new JComboBox<>();
@@ -73,7 +73,7 @@ public class MainMenu extends JFrame implements ActionListener {
         JPanel middle = new JPanel();
         middle.add(new JScrollPane(table));
         JPanel south = new JPanel();
-        Arrays.stream(buttons).forEach(south::add);
+        buttons.forEach(south::add);
 
         add(BorderLayout.NORTH, top);
         add(BorderLayout.CENTER, middle);
@@ -81,7 +81,7 @@ public class MainMenu extends JFrame implements ActionListener {
 
         MyButton.applyHandCursor.accept(buttons);
         comboBoxGenres.addActionListener(this);
-        Arrays.stream(buttons).forEach(button -> button.addActionListener(this));
+        buttons.forEach(button -> button.addActionListener(this));
 
         populateList();
         setVisible(true);
@@ -110,7 +110,8 @@ public class MainMenu extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         MyWindow.setHasOpenMainMenu(true);
-        Runnable action = componentActions.get(e.getSource());
+        var source = e.getSource();
+        Runnable action = componentActions.get(source);
         if (action != null) action.run();
     }
 

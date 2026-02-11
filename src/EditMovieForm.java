@@ -23,15 +23,21 @@ public class EditMovieForm extends JFrame implements ActionListener {
     private final JButton btnUpdateMovie = new JButton("Update Movie");
     private final JButton btnUndoTitle = new JButton("Undo title");
     private final JButton btnUndoGenre = new JButton("Undo Genre");
-    private final JButton[] buttons = {btnUpdateMovie, btnUndoTitle, btnUndoGenre};
+    private final List<JButton> buttons = List.of(
+            btnUpdateMovie,
+            btnUndoTitle,
+            btnUndoGenre
+    );
+
     private final List<Checkbox> genreCheckboxes;
-    private final Map<JButton, Runnable> buttonActions = Map.of(
+    private final Map<Object, Runnable> componentActions = Map.of(
             btnUndoGenre, this::undoGenreSelection,
             btnUpdateMovie, this::updateMovieAction,
             btnUndoTitle, () -> txtTitle.setText(MOVIE_TITLE)
     );
 
     public EditMovieForm(MainMenu mainMenuForm) {
+
         btnUpdateMovie.setToolTipText("Save changes to the movie");
         btnUndoGenre.setToolTipText("Undo changes to genres");
         btnUndoTitle.setToolTipText("Undo changes to the title");
@@ -60,7 +66,7 @@ public class EditMovieForm extends JFrame implements ActionListener {
         setDefaultCloseOperation(MyWindow.getCloseOperation());
         setSize(800, 400);
 
-        Arrays.stream(buttons).forEach(button -> button.addActionListener(this));
+        buttons.forEach(button -> button.addActionListener(this));
         MyButton.applyHandCursor.accept(buttons);
         showOriginalSelectedGenres.accept(genreCheckboxes);
 
@@ -84,8 +90,8 @@ public class EditMovieForm extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        JButton sourceButton = (JButton) e.getSource();
-        Runnable action = buttonActions.get(sourceButton);
+        var sourceButton = e.getSource();
+        Runnable action = componentActions.get(sourceButton);
         if (action != null) action.run();
 
     }
