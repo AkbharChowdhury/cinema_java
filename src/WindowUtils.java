@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import javax.swing.JFrame;
 
 public class WindowUtils {
@@ -12,22 +11,11 @@ public class WindowUtils {
         WindowUtils.hasOpenMainMenu = hasOpenMainMenu;
     }
 
-    public static boolean hasOpenMainMenu() {
-        return hasOpenMainMenu;
-    }
-
     public static int getCloseOperation() {
         return hasOpenMainMenu ? JFrame.DISPOSE_ON_CLOSE : JFrame.EXIT_ON_CLOSE;
     }
 
     public static Consumer<Component> applyAutofocus = (c) -> EventQueue.invokeLater(c::requestFocus);
-
-
-    public static void openNewFrame(JFrame currentFrame, Supplier<? extends JFrame> frameSupplier) {
-        if (currentFrame != null) currentFrame.dispose();
-        JFrame newFrame = frameSupplier.get();
-        newFrame.setVisible(true);
-    }
 
 
     /**
