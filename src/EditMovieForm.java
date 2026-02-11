@@ -3,15 +3,12 @@ import models.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
-public class EditMovieForm extends JFrame implements ActionListener {
+
+public class EditMovieForm extends JFrame {
     private static MainMenu mainMenu;
     private final int MOVIE_ID = MovieInfo.getMovieID();
     private final MovieDatabase db = MovieDatabase.getInstance();
@@ -20,21 +17,10 @@ public class EditMovieForm extends JFrame implements ActionListener {
     final String MOVIE_TITLE = db.fetchMovieTitle(MOVIE_ID);
     private final List<Genre> genres = Collections.unmodifiableList(db.fetchAllGenres());
     private final JTextField txtTitle = new JTextField(40);
-    private final JButton btnUpdateMovie = new JButton("Update Movie");
-    private final JButton btnUndoTitle = new JButton("Undo title");
-    private final JButton btnUndoGenre = new JButton("Undo Genre");
-    private final List<JButton> buttons = List.of(
-            btnUpdateMovie,
-            btnUndoTitle,
-            btnUndoGenre
-    );
-
+    private final JButton btnUpdateMovie = ButtonFactory.createButton("Update Movie", _ -> updateMovieAction());
+    private final JButton btnUndoGenre = ButtonFactory.createButton("Undo Genre", _ -> undoGenreSelection());
+    private final JButton btnUndoTitle = ButtonFactory.createButton("Undo title", _ -> txtTitle.setText(MOVIE_TITLE));
     private final List<Checkbox> genreCheckboxes;
-    private final Map<Object, Runnable> componentActions = Map.of(
-            btnUndoGenre, this::undoGenreSelection,
-            btnUpdateMovie, this::updateMovieAction,
-            btnUndoTitle, () -> txtTitle.setText(MOVIE_TITLE)
-    );
 
     public EditMovieForm(MainMenu mainMenuForm) {
 
@@ -66,8 +52,6 @@ public class EditMovieForm extends JFrame implements ActionListener {
         setDefaultCloseOperation(MyWindow.getCloseOperation());
         setSize(800, 400);
 
-        buttons.forEach(button -> button.addActionListener(this));
-        MyButton.applyHandCursor.accept(buttons);
         showOriginalSelectedGenres.accept(genreCheckboxes);
 
         setVisible(true);
@@ -88,13 +72,6 @@ public class EditMovieForm extends JFrame implements ActionListener {
                     .filter(checkbox -> originalSelectedGenres.stream().anyMatch(label -> label.equals(checkbox.getLabel())))
                     .forEach(checkbox -> checkbox.setState(true));
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        var sourceButton = e.getSource();
-        Runnable action = componentActions.get(sourceButton);
-        if (action != null) action.run();
-
-    }
 
     private void updateMovieAction() {
         if (!MovieFormValidator.isFormValid(txtTitle, genreCheckboxes)) return;

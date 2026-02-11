@@ -5,26 +5,21 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.function.Consumer;
 
-public class AddMovieForm extends JFrame implements ActionListener {
+public class AddMovieForm extends JFrame {
     private static MainMenu mainMenu;
     private final MovieDatabase db = MovieDatabase.getInstance();
     private final List<Genre> genres = Collections.unmodifiableList(db.fetchAllGenres());
     private final JTextField txtTitle = new JTextField(20);
-    private final JButton btnAddMovie = new JButton("Add Movie");
+    private final JButton btnAddMovie = ButtonFactory.createButton("Add Movie", _ -> handleAddMovie());
     private final List<Checkbox> genreCheckboxes;
 
     public AddMovieForm(MainMenu mainMenuForm) {
-
         mainMenu = mainMenuForm;
         btnAddMovie.setToolTipText("Add a new movie with the selected genres");
-
         setTitle("Add Movie");
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
@@ -44,17 +39,9 @@ public class AddMovieForm extends JFrame implements ActionListener {
         setContentPane(panel);
         setDefaultCloseOperation(MyWindow.getCloseOperation());
         setSize(400, 400);
-        btnAddMovie.addActionListener(this);
-        MyButton.applyHandCursor.accept(List.of(btnAddMovie));
         MyWindow.applyAutofocus.accept(txtTitle);
         setVisible(true);
 
-    }
-
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        handleAddMovie();
     }
 
 

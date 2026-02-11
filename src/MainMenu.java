@@ -19,8 +19,8 @@ public class MainMenu extends JFrame implements ActionListener {
     private final JButton btnAdd = new JButton("Add");
     private final JButton btnEdit = new JButton("Edit");
     private final JButton btnRemove = new JButton("Remove");
+    @SuppressWarnings("FieldCanBeLocal")
     private final List<JButton> buttons = List.of(btnAdd, btnEdit, btnRemove);
-
     private final JTextField txtTitle = new JTextField(40);
     private final JComboBox<String> comboBoxGenres = new JComboBox<>();
     private final JTable table = new JTable();
@@ -79,7 +79,7 @@ public class MainMenu extends JFrame implements ActionListener {
         add(BorderLayout.CENTER, middle);
         add(BorderLayout.SOUTH, south);
 
-        MyButton.applyHandCursor.accept(buttons);
+        ButtonFactory.applyHandCursor.accept(buttons);
         comboBoxGenres.addActionListener(this);
         buttons.forEach(button -> button.addActionListener(this));
 
