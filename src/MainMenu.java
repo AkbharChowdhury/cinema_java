@@ -108,7 +108,7 @@ public class MainMenu extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        WindowUtils.setHasOpenMainMenu(true);
+        MainMenuState.setHasOpenMainMenu(true);
         var source = e.getSource();
         Runnable action = componentActions.get(source);
         if (action != null) action.run();

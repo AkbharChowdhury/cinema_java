@@ -1,35 +1,30 @@
-import java.awt.*;
-import java.util.function.Consumer;
+import java.awt.Component;
+import java.awt.EventQueue;
 import javax.swing.JFrame;
+import java.util.function.Consumer;
 
-public class WindowUtils {
-
-    private static boolean hasOpenMainMenu;
-    public static void setHasOpenMainMenu(boolean open) {
-        hasOpenMainMenu = open;
-    }
-
-    public static int getCloseOperation() {
-        return hasOpenMainMenu ? JFrame.DISPOSE_ON_CLOSE : JFrame.EXIT_ON_CLOSE;
-    }
-
-    public static Consumer<Component> applyAutofocus = (c) -> EventQueue.invokeLater(c::requestFocus);
+public final class WindowUtils {
 
 
     /**
-     * Closes the current frame and opens a new MainMenu.
+     * Apply autofocus to a component after the EventQueue processes the event.
+     */
+    public static final Consumer<Component> applyAutofocus = (c) -> EventQueue.invokeLater(c::requestFocus);
+
+    /**
+     * Closes the current frame and opens the MainMenu frame.
      *
-     * @param currentFrame The JFrame that should be closed
+     * @param currentFrame  The JFrame that should be closed
+     * @param mainMenuFrame The existing MainMenu frame (if any)
      */
     public static void openMainMenu(JFrame currentFrame, JFrame mainMenuFrame) {
         // Close existing main menu if it exists
         if (mainMenuFrame != null) mainMenuFrame.dispose();
+
         // Close the current frame
-        currentFrame.dispose();
-        new MainMenu();
+        if (currentFrame != null) currentFrame.dispose();
 
-
+        // Open a new MainMenu
+        new MainMenu();  // Ensure you call setVisible(true) in the MainMenu constructor if necessary
     }
-
-
 }
