@@ -1,7 +1,17 @@
 import models.*;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JFrame;
+import javax.swing.JTextField;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JLabel;
+
+
+
+
+import java.awt.Checkbox;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
@@ -47,7 +57,7 @@ public class EditMovieForm extends JFrame {
         panel.add(middle, BorderLayout.CENTER);
         panel.add(btnUpdateMovie, BorderLayout.SOUTH);
         setContentPane(panel);
-        setDefaultCloseOperation(MainMenuState.getCloseOperation());
+        setDefaultCloseOperation(MainMenuState.getCloseOperation.get());
         setSize(800, 400);
 
         showOriginalSelectedGenres.accept(genreCheckboxes);
