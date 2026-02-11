@@ -13,9 +13,7 @@ public class AddMovieForm extends JFrame {
     private final JTextField txtTitle = new JTextField(20);
     private final JButton btnAddMovie = ButtonFactory.createButton("Add Movie", _ -> handleAddMovie());
     private final List<Checkbox> genreCheckboxes;
-//    private void handle(){
-//        WindowUtils.openNewFrame(this, MainMenu::new);
-//    }
+
     public AddMovieForm(MainMenu mainMenuForm) {
         mainMenu = mainMenuForm;
 
@@ -59,6 +57,12 @@ public class AddMovieForm extends JFrame {
 //        redirectToMainMenu();
         WindowUtils.openMainMenu(this, mainMenu);
     }
+
+//    private void redirectToMainMenu() {
+//        if (mainMenu != null) mainMenu.dispose();
+//        dispose();
+//        new MainMenu();
+//    }
 
 
 

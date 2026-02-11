@@ -82,24 +82,10 @@ public class EditMovieForm extends JFrame {
         List<Integer> selectedGenreIds = Genre.getSelectedGenres.apply(genreCheckboxes, genres).stream().map(Genre::id).toList();
         db.addGenresToMovie(MOVIE_ID, selectedGenreIds);
         Messages.message.accept("Movie updated");
-//        redirectToMainMenu();
         WindowUtils.openMainMenu(this, mainMenu);
     }
 
-//    private void redirectToMainMenu() {
-//        if (mainMenu != null) mainMenu.dispose();
-//        dispose();
-//        new MainMenu();
-//    }
-    private void redirect(JFrame newForm, JFrame currentForm){
-        if (newForm!=null) newForm.dispose();
-        currentForm.dispose();
 
-
-
-
-
-    }
 
     void main() {
         new EditMovieForm(mainMenu);

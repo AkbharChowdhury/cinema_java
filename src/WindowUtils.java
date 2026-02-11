@@ -35,10 +35,10 @@ public class WindowUtils {
      *
      * @param currentFrame The JFrame that should be closed
      */
-    public static void openMainMenu(JFrame currentFrame, JFrame mainMen) {
-        if (mainMen != null) mainMen.dispose();
+    public static void openMainMenu(JFrame currentFrame, JFrame mainMenuFrame) {
+        if (mainMenuFrame != null) mainMenuFrame.dispose();
         currentFrame.dispose();
-        new MainMenu();                // create main menu from models package
+        new MainMenu();
     }
 
 }
