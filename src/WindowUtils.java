@@ -25,6 +25,7 @@ public final class WindowUtils {
         if (currentFrame != null) currentFrame.dispose();
 
         // Open a new MainMenu
-        new MainMenu();  // Ensure you call setVisible(true) in the MainMenu constructor if necessary
+        MainMenu mainMenu = new MainMenu();
+        mainMenu.setVisible(true);
     }
 }
