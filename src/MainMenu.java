@@ -102,9 +102,6 @@ public class MainMenu extends JFrame implements ActionListener {
     }
 
     void main() {
-//        new MainMenu();
-
-
 
     }
 

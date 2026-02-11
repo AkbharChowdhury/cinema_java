@@ -83,8 +83,6 @@ public class EditMovieForm extends JFrame {
         WindowUtils.openMainMenu(this, mainMenu);
     }
 
-
-
     void main() {
         new EditMovieForm(mainMenu);
     }

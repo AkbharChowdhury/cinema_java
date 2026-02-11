@@ -54,16 +54,8 @@ public class AddMovieForm extends JFrame {
 
         clearForm();
         Messages.message.accept("Movie Added");
-//        redirectToMainMenu();
         WindowUtils.openMainMenu(this, mainMenu);
     }
-//
-//    private void redirectToMainMenu() {
-//        if (mainMenu != null) mainMenu.dispose();
-//        dispose();
-//        new MainMenu();
-//    }
-
 
 
     private void clearForm() {
