@@ -1,4 +1,3 @@
-import models.*;
 
 import javax.swing.JFrame;
 import javax.swing.JTextField;
@@ -7,14 +6,17 @@ import javax.swing.JPanel;
 import javax.swing.JLabel;
 
 
-
-
 import java.awt.Checkbox;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+import models.ButtonFactory;
+import models.Genre;
+import models.Messages;
+import models.MovieFormValidator;
+import models.MovieInfo;
 
 
 public class EditMovieForm extends JFrame {

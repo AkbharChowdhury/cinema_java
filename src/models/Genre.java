@@ -2,7 +2,10 @@ package models;
 
 import java.awt.Checkbox;
 import java.util.List;
-import java.util.function.*;
+import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public record Genre(int id, String name) {
     public static Supplier<String> anyGenre = () -> "Any";

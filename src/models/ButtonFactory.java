@@ -1,10 +1,10 @@
 package models;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Cursor;
 import java.awt.event.ActionListener;
-import java.util.function.Consumer;
 import java.util.List;
+import java.util.function.Consumer;
+import javax.swing.JButton;
 
 
 public class ButtonFactory {

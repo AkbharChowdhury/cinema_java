@@ -1,15 +1,30 @@
-import models.*;
-
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 import java.util.function.Supplier;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableModel;
+import models.ButtonFactory;
+import models.Genre;
+import models.Messages;
+import models.Movie;
+import models.MovieInfo;
+import models.SearchMovies;
 
 public class MainMenu extends JFrame implements ActionListener {
     private final MovieDatabase db = MovieDatabase.getInstance();

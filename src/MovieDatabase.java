@@ -1,12 +1,19 @@
+import java.sql.Array;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 import models.Genre;
 import models.Messages;
 import models.Movie;
 import org.apache.commons.lang3.text.WordUtils;
-
-import java.sql.*;
-import java.text.MessageFormat;
-import java.util.*;
-
 
 import static models.Messages.printErrorMessage;
 

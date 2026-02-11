@@ -1,6 +1,6 @@
 package models;
 
-import java.awt.*;
+import java.awt.Component;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 

@@ -1,10 +1,21 @@
-import models.*;
 
-import javax.swing.*;
-import java.awt.*;
+
+import java.awt.BorderLayout;
+import java.awt.Checkbox;
+import java.awt.GridLayout;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import models.ButtonFactory;
+import models.Genre;
+import models.Messages;
+import models.MovieFormValidator;
 
 public class AddMovieForm extends JFrame {
     private static MainMenu mainMenu;
