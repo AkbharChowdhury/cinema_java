@@ -13,8 +13,7 @@ public class EditMovieForm extends JFrame {
     private final int MOVIE_ID = MovieInfo.getMovieID();
     private final MovieDatabase db = MovieDatabase.getInstance();
     private final List<String> originalSelectedGenres = db.fetchMovieGenres(MOVIE_ID);
-
-    final String MOVIE_TITLE = db.fetchMovieTitle(MOVIE_ID);
+    private final String MOVIE_TITLE = db.fetchMovieTitle(MOVIE_ID);
     private final List<Genre> genres = Collections.unmodifiableList(db.fetchAllGenres());
     private final JTextField txtTitle = new JTextField(40);
     private final JButton btnUpdateMovie = ButtonFactory.createButton("Update Movie", _ -> updateMovieAction());
@@ -49,7 +48,7 @@ public class EditMovieForm extends JFrame {
         panel.add(middle, BorderLayout.CENTER);
         panel.add(btnUpdateMovie, BorderLayout.SOUTH);
         setContentPane(panel);
-        setDefaultCloseOperation(MyWindow.getCloseOperation());
+        setDefaultCloseOperation(WindowUtils.getCloseOperation());
         setSize(800, 400);
 
         showOriginalSelectedGenres.accept(genreCheckboxes);
@@ -62,7 +61,6 @@ public class EditMovieForm extends JFrame {
     private void undoGenreSelection() {
         resetGenreSelection.accept(genreCheckboxes);
         showOriginalSelectedGenres.accept(genreCheckboxes);
-
     }
 
     private final Consumer<List<Checkbox>> resetGenreSelection = (genreCheckboxes) -> genreCheckboxes.forEach(checkbox -> checkbox.setState(false));
@@ -92,6 +90,15 @@ public class EditMovieForm extends JFrame {
         if (mainMenu != null) mainMenu.dispose();
         dispose();
         new MainMenu();
+    }
+    private void redirect(JFrame newForm, JFrame currentForm){
+        if (newForm!=null) newForm.dispose();
+        currentForm.dispose();
+
+
+
+
+
     }
 
     void main() {

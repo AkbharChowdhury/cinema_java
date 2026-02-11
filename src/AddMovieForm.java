@@ -3,8 +3,6 @@ import models.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -14,11 +12,14 @@ public class AddMovieForm extends JFrame {
     private final MovieDatabase db = MovieDatabase.getInstance();
     private final List<Genre> genres = Collections.unmodifiableList(db.fetchAllGenres());
     private final JTextField txtTitle = new JTextField(20);
-    private final JButton btnAddMovie = ButtonFactory.createButton("Add Movie", _ -> handleAddMovie());
+    private final JButton btnAddMovie = ButtonFactory.createButton("Add Movie", _ -> handle());
     private final List<Checkbox> genreCheckboxes;
-
+    private void handle(){
+        WindowUtils.openNewFrame(this, MainMenu::new);
+    }
     public AddMovieForm(MainMenu mainMenuForm) {
         mainMenu = mainMenuForm;
+
         btnAddMovie.setToolTipText("Add a new movie with the selected genres");
         setTitle("Add Movie");
         JPanel panel = new JPanel();
@@ -37,9 +38,9 @@ public class AddMovieForm extends JFrame {
         panel.add(btnAddMovie, BorderLayout.SOUTH);
 
         setContentPane(panel);
-        setDefaultCloseOperation(MyWindow.getCloseOperation());
+        setDefaultCloseOperation(WindowUtils.getCloseOperation());
         setSize(400, 400);
-        MyWindow.applyAutofocus.accept(txtTitle);
+        WindowUtils.applyAutofocus.accept(txtTitle);
         setVisible(true);
 
     }
@@ -56,13 +57,12 @@ public class AddMovieForm extends JFrame {
 
         clearForm();
         Messages.message.accept("Movie Added");
-
         redirectToMainMenu();
     }
 
     private void redirectToMainMenu() {
         if (mainMenu != null) mainMenu.dispose();
-        dispose();
+        this.dispose();
         new MainMenu();
     }
 
