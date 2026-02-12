@@ -175,7 +175,7 @@ public class MovieDatabase {
         if (!ALLOWED_ID_FIELDS.contains(idField)) {
             String message = MessageFormat.format("""
                             Invalid id field: "{0}". Must be one of {1}.
-                            """,
+                            """.trim(),
                     idField,
                     ALLOWED_ID_FIELDS
             );
