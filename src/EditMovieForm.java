@@ -24,7 +24,7 @@ public class EditMovieForm extends JFrame {
     private final int MOVIE_ID = MovieInfo.getMovieID();
     private final MovieDatabase db = MovieDatabase.getInstance();
     private final List<String> originalSelectedGenres = db.fetchMovieGenres(MOVIE_ID);
-    private final String MOVIE_TITLE = db.fetchMovieTitle(MOVIE_ID);
+    private final String MOVIE_TITLE = db.fetchMovieTitle(MOVIE_ID).orElse("Movie title not found");
     private final List<Genre> genres = Collections.unmodifiableList(db.fetchAllGenres());
     private final JTextField txtTitle = new JTextField(40);
     private final JButton btnUpdateMovie = ButtonFactory.createButton("Update Movie", _ -> updateMovieAction());

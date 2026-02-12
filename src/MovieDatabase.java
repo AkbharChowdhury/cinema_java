@@ -1,23 +1,31 @@
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import models.Genre;
-import models.Messages;
 import models.Movie;
 import org.apache.commons.lang3.text.WordUtils;
 
 import static models.Messages.printErrorMessage;
 
 public class MovieDatabase {
+    private static final Set<String> ALLOWED_TABLES =  Set.of("movies", "genres", "movie_genres");
+    private static final Set<String> ALLOWED_ID_FIELDS =  Set.of("movie_id", "genre_id");
+
+    private static final String UPDATE_MOVIE_TITLE_SQL = "UPDATE movies SET title = ? WHERE movie_id = ?";
+    private static final String ADD_MOVIE_WITH_GENRES_SQL = "CALL pr_add_movie_and_genres(?, ?)";
+
+    private static final String FETCH_MOVIE_GENRES_SQL = "SELECT genre FROM fn_get_selected_movie_genres(?) ORDER BY genre";
+    private static final String FETCH_MOVIE_TITLE_SQL = "SELECT title FROM movies WHERE movie_id = ?";
+    private static final String FETCH_ALL_GENRES_SQL = "SELECT genre_id, genre FROM genres ORDER BY genre";
+    private static final String FETCH_MOVIES_SQL = "SELECT movie_id, title, genres FROM view_all_movies";
+
     private MovieDatabase() {
     }
 
@@ -30,7 +38,7 @@ public class MovieDatabase {
             final String DB_NAME = "cinema";
             Class.forName("org.postgresql.Driver");
             connection = DriverManager.getConnection(String.format("jdbc:postgresql://localhost:5432/%s", DB_NAME), props.getProperty("USERNAME"), props.getProperty("PASSWORD"));
-        } catch (Exception ex) {
+        } catch (ClassNotFoundException | SQLException ex) {
             printErrorMessage.accept(ex.getMessage());
         }
         return connection;
@@ -38,16 +46,12 @@ public class MovieDatabase {
     }
 
     public static MovieDatabase getInstance() {
-        try {
-            if (instance == null) {
-                synchronized (MovieDatabase.class) {
-                    if (instance == null) {
-                        instance = new MovieDatabase();
-                    }
+        if (instance == null) {
+            synchronized (MovieDatabase.class) {
+                if (instance == null) {
+                    instance = new MovieDatabase();
                 }
             }
-        } catch (Exception ex) {
-            Messages.printErrorMessage.accept(ex.getMessage());
         }
 
         return instance;
@@ -73,88 +77,120 @@ public class MovieDatabase {
     }
 
     public List<Movie> fetchMovies() {
-        List<Movie> movieList = new ArrayList<>();
+        List<Movie> movies = new ArrayList<>();
+
         try (var con = getConnection();
-             var stmt = con.createStatement();
-             var rs = stmt.executeQuery("SELECT movie_id, title, genres  FROM view_all_movies")
-        ) {
+             var stmt = con.prepareStatement(FETCH_MOVIES_SQL);
+             var rs = stmt.executeQuery()) {
+
             while (rs.next()) {
-                movieList.add(new Movie(rs.getInt(MovieSchema.MOVIE_ID), rs.getString(MovieSchema.MOVIE_TITLE), rs.getString(MovieSchema.GENRES)));
+                movies.add(new Movie(
+                        rs.getInt("movie_id"),
+                        rs.getString("title"),
+                        rs.getString("genres")
+                ));
             }
 
-        } catch (Exception ex) {
-            printErrorMessage.accept(ex.getMessage());
-
+        } catch (SQLException ex) {
+            throw new RuntimeException("Failed to fetch movies", ex);
         }
-        return movieList;
 
+        return movies;
     }
 
 
     public List<Genre> fetchAllGenres() {
-        List<Genre> genres = new ArrayList<>();
         try (var con = getConnection();
-             var stmt = con.createStatement();
-             var rs = stmt.executeQuery("SELECT genre, genre_id FROM genres")
-        ) {
+             var stmt = con.prepareStatement(FETCH_ALL_GENRES_SQL);
+             var rs = stmt.executeQuery()) {
+
+            var result = new ArrayList<Genre>();
 
             while (rs.next()) {
-                genres.add(new Genre(rs.getInt(MovieSchema.GENRE_ID), rs.getString(MovieSchema.GENRE)));
+                result.add(new Genre(
+                        rs.getInt("genre_id"),
+                        rs.getString("genre")
+                ));
             }
 
-        } catch (Exception ex) {
-            printErrorMessage.accept(ex.getMessage());
+            return List.copyOf(result);
 
+        } catch (SQLException ex) {
+            throw new RuntimeException("Failed to fetch genres", ex);
         }
-        return genres.stream().sorted(Comparator.comparing(Genre::name)).toList();
-
     }
 
-    public String fetchMovieTitle(int movieId) {
 
+    public Optional<String> fetchMovieTitle(int movieId) {
         try (var con = getConnection();
-             var stmt = con.prepareStatement("SELECT title FROM movies WHERE movie_id = ?")) {
+             var stmt = con.prepareStatement(FETCH_MOVIE_TITLE_SQL)) {
+
             stmt.setInt(1, movieId);
-            try (ResultSet rs = stmt.executeQuery()) {
+
+            try (var rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getString(1);
+                    return Optional.ofNullable(rs.getString("title"));
                 }
             }
-        } catch (Exception ex) {
-            printErrorMessage.accept(ex.getMessage());
+
+            return Optional.empty();
+
+        } catch (SQLException ex) {
+            throw new RuntimeException(
+                    "Failed to fetch movie title for id: " + movieId, ex);
         }
-
-        return MessageFormat.format("Error fetching movie name by movie id, Movie ID {0} does not exist", movieId);
-
     }
 
 
     public List<String> fetchMovieGenres(int movieId) {
-        List<String> genres = new ArrayList<>();
         try (var con = getConnection();
-             var stmt = con.prepareStatement("SELECT genre FROM fn_get_selected_movie_genres(?);")) {
-            stmt.setInt(1, movieId);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                genres.add(rs.getString(1));
-            }
-        } catch (Exception ex) {
-            printErrorMessage.accept(ex.getMessage());
-        }
-        return genres;
+             var stmt = con.prepareStatement(FETCH_MOVIE_GENRES_SQL)) {
 
+            stmt.setInt(1, movieId);
+
+            try (var rs = stmt.executeQuery()) {
+
+                var genres = new ArrayList<String>();
+
+                while (rs.next()) {
+                    genres.add(rs.getString("genre"));
+                }
+
+                return List.copyOf(genres);
+            }
+
+        } catch (SQLException ex) {
+            throw new RuntimeException(
+                    "Failed to fetch genres for movie id: " + movieId, ex);
+        }
     }
 
 
     public void deleteRecord(String tableName, String idField, int id) {
-        try (Connection con = getConnection();
-             PreparedStatement stmt = con.prepareStatement(String.format("DELETE FROM %s WHERE %s = ?", tableName, idField))) {
+
+        if (!ALLOWED_TABLES.contains(tableName)) {
+            throw new IllegalArgumentException("Invalid table name: " + tableName + " Must be of " + ALLOWED_TABLES);
+        }
+
+        if (!ALLOWED_ID_FIELDS.contains(idField)) {
+            throw new IllegalArgumentException("Invalid id field: " + idField + " Must be of " + ALLOWED_ID_FIELDS);
+        }
+
+        String sql = "DELETE FROM " + tableName + " WHERE " + idField + " = ?";
+
+        try (var con = getConnection();
+             var stmt = con.prepareStatement(sql)) {
+
             stmt.setInt(1, id);
-            stmt.execute();
-        } catch (Exception ex) {
-            printErrorMessage.accept(ex.getMessage());
+            stmt.executeUpdate();
+
+        } catch (SQLException ex) {
+            throw new RuntimeException(
+                    "Failed to delete record from " + tableName +
+                            " with id: " + id, ex);
         }
     }
+
 
     public void addGenresToMovie(int movieId, List<Integer> genreIds) {
         try (Connection con = getConnection()) {
@@ -165,37 +201,67 @@ public class MovieDatabase {
                 stmt.executeUpdate();
             }
 
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             printErrorMessage.accept(ex.getMessage());
         }
     }
 
-    public boolean updateMovieTitle(String newTitle, int movieId) {
-        try (var con = getConnection()) {
-            var stmt = con.prepareStatement("UPDATE movies SET title = ? WHERE movie_id = ?");
+
+    public void updateMovieTitle(String newTitle, int movieId) {
+
+        if (newTitle == null || newTitle.isBlank()) {
+            throw new IllegalArgumentException("Movie title cannot be empty");
+        }
+
+        try (var con = getConnection();
+             var stmt = con.prepareStatement(UPDATE_MOVIE_TITLE_SQL)) {
+
             stmt.setString(1, newTitle);
             stmt.setInt(2, movieId);
-            return stmt.executeUpdate() != 0;
 
-        } catch (Exception ex) {
-            printErrorMessage.accept(ex.getMessage());
+            int affectedRows = stmt.executeUpdate();
+
+            if (affectedRows == 0) {
+                throw new IllegalArgumentException(
+                        MessageFormat.format("This movie id {0} does not exist", movieId));
+            }
+
+        } catch (SQLException ex) {
+            throw new RuntimeException(
+                    "Failed to update movie title for movie_id: " + movieId, ex);
         }
-        return false;
     }
 
     public boolean addMovieWithGenres(String title, Set<Integer> genreIds) {
-        try (var con = getConnection()) {
-            var stmt = con.prepareStatement("CALL pr_add_movie_and_genres(?, ?)");
-            Array genreArray = con.createArrayOf("INTEGER", new Object[]{genreIds.toArray(new Integer[0])});
-            stmt.setString(1, title);
-            stmt.setArray(2, genreArray);
-            return stmt.executeUpdate() == -1;
 
-        } catch (Exception ex) {
-            printErrorMessage.accept(ex.getMessage());
+        if (title == null || title.isBlank()) {
+            throw new IllegalArgumentException("Movie title cannot be empty");
         }
-        return false;
+
+        if (genreIds == null || genreIds.isEmpty()) {
+            throw new IllegalArgumentException("At least one genre must be provided");
+        }
+
+        try (var con = getConnection();
+             var stmt = con.prepareCall(ADD_MOVIE_WITH_GENRES_SQL)) {
+
+            stmt.setString(1, title);
+
+            // PostgreSQL integer array
+            Array genreArray = con.createArrayOf("INTEGER", genreIds.toArray(new Integer[0]));
+            stmt.setArray(2, genreArray);
+
+            stmt.execute();  // use execute() for procedures
+
+            return true;
+
+        } catch (SQLException ex) {
+            throw new RuntimeException(
+                    "Failed to add movie with genres. Title: " + title, ex);
+        }
     }
+
+
 }
 
 
