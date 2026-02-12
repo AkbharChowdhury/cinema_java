@@ -5,3 +5,4 @@ out/production/cinema_java
 .DS_Store
 cinema_java.iml
 src/Main.java
+src/TestApp.java

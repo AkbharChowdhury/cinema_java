@@ -163,7 +163,7 @@ public class MainMenu extends JFrame implements ActionListener {
 
     private int getSelectedMovieId() {
         int selectedIndex = table.getSelectedRow();
-        movies = search.filterMovies.get();
+        movies = search.filter();
         return movies.get(selectedIndex).id();
     }
 
@@ -177,28 +177,21 @@ public class MainMenu extends JFrame implements ActionListener {
             showMovieRequiredMessage();
             return;
         }
-
         if (!Messages.hasConfirmed.apply("Are you sure you want to remove this movie?")) return;
-
-
         deleteMovie(movieId);
-        refreshMovieList();
+
     }
 
-    private void deleteMovie(int id) {
-        db.deleteRecord(MovieSchema.MOVIE_TABLE, MovieSchema.MOVIE_ID, id);
-        tableModel.removeRow(table.getSelectedRow());
-    }
-
-    private void refreshMovieList() {
-        search.setList(db.fetchMovies());
+    private void deleteMovie(int movieId) {
+        db.deleteRecord(MovieSchema.MOVIE_TABLE, MovieSchema.MOVIE_ID, movieId);
+        search.setMovies(db.fetchMovies());
         populateList();
     }
 
 
     private void populateList() {
         tableModel.setRowCount(0);
-        search.filterMovies.get().forEach(this::addMovieRow);
+        search.filter().forEach(this::addMovieRow);
 
     }
 
@@ -208,8 +201,6 @@ public class MainMenu extends JFrame implements ActionListener {
                 movie.genres()
         });
     }
-
-
 
 
 }
