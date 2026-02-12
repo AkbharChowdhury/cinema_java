@@ -23,7 +23,6 @@ import models.ButtonFactory;
 import models.Genre;
 import models.Messages;
 import models.Movie;
-import models.MovieInfo;
 import models.SearchMovies;
 
 public class MainMenu extends JFrame implements ActionListener {
@@ -140,7 +139,7 @@ public class MainMenu extends JFrame implements ActionListener {
             return;
         }
         int movieId = getSelectedMovieId();
-        editMovie(movieId);
+        new EditMovieForm(this, movieId).setVisible(true);
 
     }
 
@@ -154,12 +153,6 @@ public class MainMenu extends JFrame implements ActionListener {
     }
 
     private final Supplier<Boolean> isSelectionRequired = () -> table.getSelectedRow() == -1;
-
-
-    private void editMovie(int movieId) {
-        MovieInfo.setMovieID(movieId);
-        new EditMovieForm(MainMenu.this).setVisible(true);
-    }
 
     private int getSelectedMovieId() {
         int selectedIndex = table.getSelectedRow();
@@ -183,7 +176,11 @@ public class MainMenu extends JFrame implements ActionListener {
     }
 
     private void deleteMovie(int movieId) {
-        db.deleteRecord(MovieSchema.MOVIE_TABLE, MovieSchema.MOVIE_ID, movieId);
+        boolean deleted = MovieSchema.deleteMovie(MovieSchema.MOVIE_TABLE, movieId, db);
+        if (!deleted) {
+            Messages.showErrorMessage.accept("Movie error", "Cannot delete movie");
+            return;
+        }
         search.setMovies(db.fetchMovies());
         populateList();
     }

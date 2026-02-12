@@ -166,14 +166,20 @@ public class MovieDatabase {
     }
 
 
-    public void deleteRecord(String tableName, String idField, int id) {
+    public boolean deleteRecord(String tableName, String idField, int id) {
 
         if (!ALLOWED_TABLES.contains(tableName)) {
             throw new IllegalArgumentException("Invalid table name: " + tableName + " Must be of " + ALLOWED_TABLES);
         }
 
         if (!ALLOWED_ID_FIELDS.contains(idField)) {
-            throw new IllegalArgumentException("Invalid id field: " + idField + " Must be of " + ALLOWED_ID_FIELDS);
+            String message = MessageFormat.format("""
+                            Invalid id field: "{0}". Must be one of {1}.
+                            """,
+                    idField,
+                    ALLOWED_ID_FIELDS
+            );
+            throw new IllegalArgumentException(message);
         }
 
         String sql = "DELETE FROM " + tableName + " WHERE " + idField + " = ?";
@@ -182,7 +188,7 @@ public class MovieDatabase {
              var stmt = con.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
-            stmt.executeUpdate();
+           return stmt.executeUpdate() !=0;
 
         } catch (SQLException ex) {
             throw new RuntimeException(
