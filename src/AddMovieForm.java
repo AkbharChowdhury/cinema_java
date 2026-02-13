@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import models.ButtonFactory;
 import models.Genre;
+import models.GenreUtils;
 import models.Messages;
 import models.MovieFormValidator;
 
@@ -38,7 +39,7 @@ public class AddMovieForm extends JFrame {
         top.add(txtTitle);
         middle.setLayout(new GridLayout(genres.size(), 2));
 
-        genreCheckboxes = Genre.createGenreCheckboxes.apply(genres);
+        genreCheckboxes = GenreUtils.createGenreCheckboxes.apply(genres);
         genreCheckboxes.forEach(middle::add);
 
         panel.add(top, BorderLayout.NORTH);
@@ -56,7 +57,7 @@ public class AddMovieForm extends JFrame {
 
     private void handleAddMovie() {
         if (!MovieFormValidator.isFormValid(txtTitle, genreCheckboxes)) return;
-        List<Integer> selectedGenres = Genre.getSelectedGenres.apply(genreCheckboxes, genres).stream().map(Genre::id).toList();
+        List<Integer> selectedGenres = GenreUtils.getSelectedGenres.apply(genreCheckboxes, genres).stream().map(Genre::id).toList();
         boolean hasAddedMovie = db.addMovieWithGenres(txtTitle.getText().trim(), new HashSet<>(selectedGenres));
         if (!hasAddedMovie) {
             Messages.showErrorMessage.accept("", "There was an error adding the movie");

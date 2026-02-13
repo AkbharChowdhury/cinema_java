@@ -1,29 +1,26 @@
-
 import enums.MovieTable;
-import javax.swing.JFrame;
-import javax.swing.JTextField;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-
-
-import java.awt.Checkbox;
 import java.awt.BorderLayout;
+import java.awt.Checkbox;
 import java.awt.GridLayout;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Consumer;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import models.ButtonFactory;
 import models.Genre;
+import models.GenreUtils;
 import models.Messages;
 import models.MovieFormValidator;
 
 
 public class EditMovieForm extends JFrame {
-    private static MainMenu mainMenu;
+    private final MainMenu mainMenu;
     private final int MOVIE_ID;
     private final MovieDatabase db = MovieDatabase.getInstance();
-    private  List<String> originalSelectedGenres;
+    private final List<String> originalSelectedGenres;
     private final String MOVIE_TITLE;
     private final List<Genre> genres = Collections.unmodifiableList(db.fetchAllGenres());
     private final JTextField txtTitle = new JTextField(40);
@@ -31,6 +28,15 @@ public class EditMovieForm extends JFrame {
     private final JButton btnUndoGenre = ButtonFactory.createButton("Undo Genre", _ -> undoGenreSelection());
     private final JButton btnUndoTitle;
     private final List<Checkbox> genreCheckboxes;
+    private List<Checkbox> createGenreCheckboxes2() {
+        return genres.stream()
+                .map(genre -> {
+                    Checkbox chk = new Checkbox(genre.name());
+                    chk.setState(originalSelectedGenres.contains(genre.name()));
+                    return chk;
+                })
+                .toList();
+    }
 
     public EditMovieForm(MainMenu mainMenuForm, int movieId) {
         MOVIE_ID = movieId;
@@ -55,7 +61,9 @@ public class EditMovieForm extends JFrame {
 
         middle.setLayout(new GridLayout(genres.size(), 2));
 
-        genreCheckboxes = Genre.createGenreCheckboxes.apply(genres);
+
+//        genreCheckboxes = Genre.createGenreCheckboxes.apply(genres);
+        genreCheckboxes = createGenreCheckboxes2();
         genreCheckboxes.forEach(middle::add);
 
         panel.add(top, BorderLayout.NORTH);
@@ -65,22 +73,25 @@ public class EditMovieForm extends JFrame {
         setDefaultCloseOperation(MainMenuState.getCloseOperation());
         setSize(800, 400);
 
-        showOriginalSelectedGenres.accept(genreCheckboxes);
+        showOriginalSelectedGenres();
 
     }
 
 
     private void undoGenreSelection() {
-        resetGenreSelection.accept(genreCheckboxes);
-        showOriginalSelectedGenres.accept(genreCheckboxes);
+        resetGenreSelection();
+        showOriginalSelectedGenres();
     }
 
-    private final Consumer<List<Checkbox>> resetGenreSelection = (genreCheckboxes) -> genreCheckboxes.forEach(checkbox -> checkbox.setState(false));
+    private void resetGenreSelection() {
+        genreCheckboxes.forEach(cb -> cb.setState(false));
+    }
 
-    private final Consumer<List<Checkbox>> showOriginalSelectedGenres = (genreCheckboxes) ->
-            genreCheckboxes.stream()
-                    .filter(checkbox -> originalSelectedGenres.stream().anyMatch(label -> label.equals(checkbox.getLabel())))
-                    .forEach(checkbox -> checkbox.setState(true));
+    private void showOriginalSelectedGenres() {
+        genreCheckboxes.stream()
+                .filter(cb -> originalSelectedGenres.contains(cb.getLabel()))
+                .forEach(cb -> cb.setState(true));
+    }
 
 
     private void updateMovieAction() {
@@ -92,7 +103,8 @@ public class EditMovieForm extends JFrame {
     private void updateMovie() {
         db.updateMovieTitle(txtTitle.getText().trim(), MOVIE_ID);
         MovieSchema.deleteMovie(MovieTable.MOVIE_GENRES, MOVIE_ID, db);
-        List<Integer> selectedGenreIds = Genre.getSelectedGenres.apply(genreCheckboxes, genres).stream().map(Genre::id).toList();
+        List<Integer> selectedGenreIds = GenreUtils.getSelectedGenres.apply(genreCheckboxes, genres).stream().map(Genre::id).toList();
+        System.out.println(selectedGenreIds);
         db.addGenresToMovie(MOVIE_ID, selectedGenreIds);
         Messages.message.accept("Movie updated");
         WindowUtils.openMainMenu(this, mainMenu);

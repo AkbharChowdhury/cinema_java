@@ -45,7 +45,7 @@ public class MovieDatabase {
         final String DB_NAME = "cinema";
         String url = String.format("jdbc:postgresql://localhost:5432/%s", DB_NAME);
         config.setJdbcUrl(url);
-        Properties props = EnvLoader.load();
+        Properties props = EnvLoader.loadProperties();
 
         config.setUsername(props.getProperty("USERNAME"));
         config.setPassword(props.getProperty("PASSWORD"));
