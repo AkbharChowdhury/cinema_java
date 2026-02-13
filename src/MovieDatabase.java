@@ -1,9 +1,11 @@
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Array;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -15,64 +17,64 @@ import org.apache.commons.lang3.text.WordUtils;
 import static models.Messages.printErrorMessage;
 
 public class MovieDatabase {
-    private static final Set<String> ALLOWED_TABLES =  Set.of("movies", "genres", "movie_genres");
-    private static final Set<String> ALLOWED_ID_FIELDS =  Set.of("movie_id", "genre_id");
+    private static final Set<String> ALLOWED_TABLES = Set.of("movies", "genres", "movie_genres");
+    private static final Set<String> ALLOWED_ID_FIELDS = Set.of("movie_id", "genre_id");
 
     private static final String UPDATE_MOVIE_TITLE_SQL = "UPDATE movies SET title = ? WHERE movie_id = ?";
     private static final String ADD_MOVIE_WITH_GENRES_SQL = "CALL pr_add_movie_and_genres(?, ?)";
 
+    private static final String FETCH_AVAILABLE_GENRES_SQL = "SELECT genre FROM available_genres ORDER BY genre";
     private static final String FETCH_MOVIE_GENRES_SQL = "SELECT genre FROM fn_get_selected_movie_genres(?) ORDER BY genre";
     private static final String FETCH_MOVIE_TITLE_SQL = "SELECT title FROM movies WHERE movie_id = ?";
     private static final String FETCH_ALL_GENRES_SQL = "SELECT genre_id, genre FROM genres ORDER BY genre";
     private static final String FETCH_MOVIES_SQL = "SELECT movie_id, title, genres FROM view_all_movies";
 
-    private MovieDatabase() {
-    }
-
-    private static volatile MovieDatabase instance;
-
-    private Connection getConnection() {
-        Connection connection = null;
-        try {
-            Properties props = EnvLoader.load();
-            final String DB_NAME = "cinema";
-            Class.forName("org.postgresql.Driver");
-            connection = DriverManager.getConnection(String.format("jdbc:postgresql://localhost:5432/%s", DB_NAME), props.getProperty("USERNAME"), props.getProperty("PASSWORD"));
-        } catch (ClassNotFoundException | SQLException ex) {
-            printErrorMessage.accept(ex.getMessage());
-        }
-        return connection;
-
+    private static class Holder {
+        private static final MovieDatabase INSTANCE = new MovieDatabase();
     }
 
     public static MovieDatabase getInstance() {
-        if (instance == null) {
-            synchronized (MovieDatabase.class) {
-                if (instance == null) {
-                    instance = new MovieDatabase();
-                }
-            }
-        }
-
-        return instance;
-
+        return MovieDatabase.Holder.INSTANCE;
     }
+
+    private final HikariDataSource dataSource;
+
+    private MovieDatabase() {
+
+        HikariConfig config = new HikariConfig();
+        final String DB_NAME = "cinema";
+        String url = String.format("jdbc:postgresql://localhost:5432/%s", DB_NAME);
+        config.setJdbcUrl(url);
+        Properties props = EnvLoader.load();
+
+        config.setUsername(props.getProperty("USERNAME"));
+        config.setPassword(props.getProperty("PASSWORD"));
+
+        config.setMaximumPoolSize(10);
+        config.setMinimumIdle(2);
+
+        this.dataSource = new HikariDataSource(config);
+    }
+
+    private Connection getConnection() throws SQLException {
+        return dataSource.getConnection(); // pooled connection
+    }
+
 
     public List<String> fetchAvailableGenres() {
         List<String> availableGenres = new ArrayList<>();
         try (var con = getConnection();
-             var stmt = con.prepareStatement("SELECT genre FROM available_genres");
+             var stmt = con.prepareStatement(FETCH_AVAILABLE_GENRES_SQL);
              var rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                availableGenres.add(rs.getString(1));
+                availableGenres.add(WordUtils.capitalizeFully(rs.getString(1)));
             }
 
         } catch (SQLException ex) {
-            printErrorMessage.accept(ex.getMessage());
+            throw new RuntimeException("Failed to fetch genres", ex);
         }
-
-        return availableGenres.stream().sorted(String.CASE_INSENSITIVE_ORDER).map(WordUtils::capitalizeFully).toList();
+        return List.copyOf(availableGenres);
 
     }
 
@@ -100,24 +102,25 @@ public class MovieDatabase {
 
 
     public List<Genre> fetchAllGenres() {
+        // Start with a reasonable initial capacity to avoid resizing the list
+        List<Genre> genres = new ArrayList<>(10);
         try (var con = getConnection();
              var stmt = con.prepareStatement(FETCH_ALL_GENRES_SQL);
              var rs = stmt.executeQuery()) {
 
-            var result = new ArrayList<Genre>();
-
             while (rs.next()) {
-                result.add(new Genre(
+                genres.add(new Genre(
                         rs.getInt("genre_id"),
                         rs.getString("genre")
                 ));
             }
 
-            return List.copyOf(result);
-
         } catch (SQLException ex) {
-            throw new RuntimeException("Failed to fetch genres", ex);
+            // Log the exception instead of just throwing it (if you have logging)
+            throw new RuntimeException("Failed to fetch genres", ex); // Re-throw or handle appropriately
         }
+
+        return Collections.unmodifiableList(genres);  // Immutable list
     }
 
 
@@ -188,7 +191,7 @@ public class MovieDatabase {
              var stmt = con.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
-           return stmt.executeUpdate() !=0;
+            return stmt.executeUpdate() != 0;
 
         } catch (SQLException ex) {
             throw new RuntimeException(
@@ -262,8 +265,7 @@ public class MovieDatabase {
             return true;
 
         } catch (SQLException ex) {
-            throw new RuntimeException(
-                    "Failed to add movie with genres. Title: " + title, ex);
+            throw new RuntimeException("Failed to add movie with genres. Title: " + title, ex);
         }
     }
 

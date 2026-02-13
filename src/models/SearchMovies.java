@@ -1,9 +1,7 @@
 package models;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -27,8 +25,7 @@ public final class SearchMovies {
     public List<Movie> filter() {
         return movies.stream()
                 .filter(filterByTitle.and(filterByGenre))
-                .collect(Collectors.toCollection(ArrayList::new));
-//                .toList();
+                .toList();
     }
 
 }
