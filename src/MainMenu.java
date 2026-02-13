@@ -1,3 +1,4 @@
+import enums.MovieTable;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -176,7 +177,7 @@ public class MainMenu extends JFrame implements ActionListener {
     }
 
     private void deleteMovie(int movieId) {
-        boolean deleted = MovieSchema.deleteMovie(MovieSchema.MOVIE_TABLE, movieId, db);
+        boolean deleted = MovieSchema.deleteMovie(MovieTable.MOVIES, movieId, db);
         if (!deleted) {
             Messages.showErrorMessage.accept("Movie error", "Cannot delete movie");
             return;

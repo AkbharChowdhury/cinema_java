@@ -22,5 +22,4 @@ public final class MainMenuState {
      */
     public static Supplier<Integer> getCloseOperation = () -> hasOpenMainMenu ? WindowConstants.DISPOSE_ON_CLOSE : WindowConstants.EXIT_ON_CLOSE;
 
-
 }
