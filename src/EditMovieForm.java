@@ -90,7 +90,7 @@ public class EditMovieForm extends JFrame {
 
     private void updateMovie() {
         db.updateMovieTitle(txtTitle.getText().trim(), MOVIE_ID);
-        db.deleteRecord("movie_genres", "movie_id", MOVIE_ID);
+        db.deleteRecord(MovieSchema.MOVIE_GENRES_TABLE, "movie_id", MOVIE_ID);
         List<Integer> selectedGenreIds = Genre.getSelectedGenres.apply(genreCheckboxes, genres).stream().map(Genre::id).toList();
         db.addGenresToMovie(MOVIE_ID, selectedGenreIds);
         Messages.message.accept("Movie updated");

@@ -1,11 +1,12 @@
 import java.util.Set;
 
-public class MovieSchema {
+public final class MovieSchema {
     private MovieSchema() {
     }
 
-    public static final String MOVIE_ID = "movie_id";
     public static final String MOVIE_TABLE = "movies";
+    public static final String MOVIE_GENRES_TABLE = "movie_genres";
+
     private static final Set<String> ALLOWED_TABLES = Set.of("movies", "movie_genres");
 
     public static boolean deleteMovie(String tableName, int movieId, MovieDatabase db) {
