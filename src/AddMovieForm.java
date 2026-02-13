@@ -6,7 +6,6 @@ import java.awt.GridLayout;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
