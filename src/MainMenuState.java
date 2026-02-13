@@ -6,18 +6,17 @@ import javax.swing.WindowConstants;
  */
 public final class MainMenuState {
 
-    private static boolean openMainMenu;
+    private static volatile boolean mainMenuOpen;
 
-    private MainMenuState() {} // prevent instantiation
-
+    private MainMenuState() {}
 
     /** Sets whether the main menu is currently open. */
-    public static void setOpen(boolean open) {
-        openMainMenu = open;
+    public static void setMainMenuOpen(boolean open) {
+        mainMenuOpen = open;
     }
 
     /** Returns the JFrame close operation based on main menu state. */
     public static int getCloseOperation() {
-        return openMainMenu ? WindowConstants.DISPOSE_ON_CLOSE : WindowConstants.EXIT_ON_CLOSE;
+        return mainMenuOpen ? WindowConstants.DISPOSE_ON_CLOSE : WindowConstants.EXIT_ON_CLOSE;
     }
 }
