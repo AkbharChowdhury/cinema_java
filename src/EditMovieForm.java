@@ -62,7 +62,7 @@ public class EditMovieForm extends JFrame {
         panel.add(middle, BorderLayout.CENTER);
         panel.add(btnUpdateMovie, BorderLayout.SOUTH);
         setContentPane(panel);
-        setDefaultCloseOperation(MainMenuState.getCloseOperation.get());
+        setDefaultCloseOperation(MainMenuState.getCloseOperation());
         setSize(800, 400);
 
         showOriginalSelectedGenres.accept(genreCheckboxes);

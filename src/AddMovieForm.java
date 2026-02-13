@@ -46,7 +46,7 @@ public class AddMovieForm extends JFrame {
         panel.add(btnAddMovie, BorderLayout.SOUTH);
 
         setContentPane(panel);
-        setDefaultCloseOperation(MainMenuState.getCloseOperation.get());
+        setDefaultCloseOperation(MainMenuState.getCloseOperation());
 
         setSize(400, 400);
         WindowUtils.applyAutofocus.accept(txtTitle);
