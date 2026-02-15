@@ -14,9 +14,9 @@ public final class SearchMovies {
     @Setter
     private String title = "";
     @Setter
-    private String genre = GenreUtils.ANY_GENRE;
+    private String genre = GenreSelectionUtils.ANY_GENRE;
     private final Predicate<Movie> filterByTitle = movie -> StringUtils.containsIgnoreCase(movie.title(), title);
-    private final Predicate<Movie> filterByGenre = movie -> GenreUtils.ANY_GENRE.equals(genre) || StringUtils.containsIgnoreCase(movie.genres(), genre);
+    private final Predicate<Movie> filterByGenre = movie -> GenreSelectionUtils.ANY_GENRE.equals(genre) || StringUtils.containsIgnoreCase(movie.genres(), genre);
 
     public SearchMovies(List<Movie> movieList) {
         movies = movieList;

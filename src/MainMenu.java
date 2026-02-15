@@ -21,7 +21,7 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 import models.ButtonFactory;
-import models.GenreUtils;
+import models.GenreSelectionUtils;
 import models.Messages;
 import models.Movie;
 import models.SearchMovies;
@@ -112,7 +112,7 @@ public class MainMenu extends JFrame implements ActionListener {
 
     private List<String> getGenres() {
         List<String> genres = new ArrayList<>(db.fetchAvailableGenres());
-        genres.addFirst(GenreUtils.ANY_GENRE);
+        genres.addFirst(GenreSelectionUtils.ANY_GENRE);
         return genres;
     }
 

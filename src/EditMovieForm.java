@@ -11,7 +11,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import models.ButtonFactory;
 import models.Genre;
-import models.GenreUtils;
+import models.GenreSelectionUtils;
 import models.Messages;
 import models.MovieFormValidator;
 
@@ -61,8 +61,6 @@ public class EditMovieForm extends JFrame {
 
         middle.setLayout(new GridLayout(genres.size(), 2));
 
-
-//        genreCheckboxes = Genre.createGenreCheckboxes.apply(genres);
         genreCheckboxes = createGenreCheckboxes2();
         genreCheckboxes.forEach(middle::add);
 
@@ -103,7 +101,7 @@ public class EditMovieForm extends JFrame {
     private void updateMovie() {
         db.updateMovieTitle(txtTitle.getText().trim(), MOVIE_ID);
         MovieSchema.deleteMovie(MovieTable.MOVIE_GENRES, MOVIE_ID, db);
-        List<Integer> selectedGenreIds = GenreUtils.getSelectedGenres.apply(genreCheckboxes, genres).stream().map(Genre::id).toList();
+        List<Integer> selectedGenreIds = GenreSelectionUtils.getSelectedGenres(genreCheckboxes, genres).stream().map(Genre::id).toList();
         db.addGenresToMovie(MOVIE_ID, selectedGenreIds);
         Messages.message.accept("Movie updated");
         WindowUtils.openMainMenu(this, mainMenu);
