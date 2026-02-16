@@ -39,12 +39,20 @@ public class MovieDatabase {
 
     private final HikariDataSource dataSource;
 
+    public void close() {
+        if (dataSource != null && !dataSource.isClosed()) {
+            dataSource.close();
+        }
+    }
+
     private MovieDatabase() {
         Properties props = EnvLoader.loadProperties();
         HikariConfig config = getConfig(props);
         this.dataSource = new HikariDataSource(config);
+        Runtime.getRuntime().addShutdownHook(new Thread(this::close));
     }
-    private HikariConfig getConfig(Properties props){
+
+    private HikariConfig getConfig(Properties props) {
         String template = props.getProperty("JDBC_URL_TEMPLATE");
         String dbName = props.getProperty("DB_NAME");
         String url = String.format(template, dbName);
