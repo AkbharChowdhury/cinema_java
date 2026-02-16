@@ -90,7 +90,6 @@ public class MovieDatabase {
 
     public List<Movie> fetchMovies() {
         List<Movie> movies = new ArrayList<>();
-
         try (var con = getConnection();
              var stmt = con.prepareStatement(FETCH_MOVIES_SQL);
              var rs = stmt.executeQuery()) {
@@ -112,25 +111,20 @@ public class MovieDatabase {
 
 
     public List<Genre> fetchAllGenres() {
-        // Start with a reasonable initial capacity to avoid resizing the list
-        List<Genre> genres = new ArrayList<>(10);
         try (var con = getConnection();
              var stmt = con.prepareStatement(FETCH_ALL_GENRES_SQL);
              var rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                genres.add(new Genre(
-                        rs.getInt("genre_id"),
-                        rs.getString("genre")
-                ));
-            }
+            return Collections.unmodifiableList(
+                    new ArrayList<>() {{
+                        while (rs.next()) {
+                            add(new Genre(rs.getInt("genre_id"), rs.getString("genre")));
+                        }
+                    }}
+            );
 
         } catch (SQLException ex) {
-            // Log the exception instead of just throwing it (if you have logging)
-            throw new RuntimeException("Failed to fetch genres", ex); // Re-throw or handle appropriately
+            throw new RuntimeException("Failed to fetch genres", ex);
         }
-
-        return Collections.unmodifiableList(genres);  // Immutable list
     }
 
 
