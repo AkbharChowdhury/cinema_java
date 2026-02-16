@@ -162,7 +162,7 @@ public class MainMenu extends JFrame implements ActionListener {
     }
 
     private void showMovieRequiredMessage() {
-        Messages.showErrorMessage.accept("No Selection", "Please select a movie");
+        Messages.showError.accept("No Selection", "Please select a movie");
     }
 
 
@@ -179,7 +179,7 @@ public class MainMenu extends JFrame implements ActionListener {
     private void deleteMovie(int movieId) {
         boolean deleted = MovieSchema.deleteMovie(MovieTable.MOVIES, movieId, db);
         if (!deleted) {
-            Messages.showErrorMessage.accept("Movie error", "Cannot delete movie");
+            Messages.showError.accept("Movie error", "Cannot delete movie");
             return;
         }
         search.setMovies(db.fetchMovies());

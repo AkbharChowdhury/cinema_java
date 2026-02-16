@@ -60,7 +60,7 @@ public class AddMovieForm extends JFrame {
         List<Integer> selectedGenres = GenreSelectionUtils.getSelectedGenres(genreCheckboxes, genres).stream().map(Genre::id).toList();
         boolean hasAddedMovie = db.addMovieWithGenres(txtTitle.getText().trim(), new HashSet<>(selectedGenres));
         if (!hasAddedMovie) {
-            Messages.showErrorMessage.accept("", "There was an error adding the movie");
+            Messages.showError.accept("", "There was an error adding the movie");
             return;
         }
 
@@ -71,8 +71,8 @@ public class AddMovieForm extends JFrame {
 
 
     private void clearForm() {
-        txtTitle.setText("");
-        genreCheckboxes.forEach(checkbox -> checkbox.setState(false));
+        txtTitle.setText(null);
+        genreCheckboxes.forEach(checkbox ->  checkbox.setState(false));
     }
 
 

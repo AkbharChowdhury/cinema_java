@@ -40,20 +40,22 @@ public class MovieDatabase {
     private final HikariDataSource dataSource;
 
     private MovieDatabase() {
-
-        HikariConfig config = new HikariConfig();
-        final String DB_NAME = "cinema";
-        String url = String.format("jdbc:postgresql://localhost:5432/%s", DB_NAME);
-        config.setJdbcUrl(url);
         Properties props = EnvLoader.loadProperties();
-
+        HikariConfig config = getConfig(props);
+        this.dataSource = new HikariDataSource(config);
+    }
+    private HikariConfig getConfig(Properties props){
+        String template = props.getProperty("JDBC_URL_TEMPLATE");
+        String dbName = props.getProperty("DB_NAME");
+        String url = String.format(template, dbName);
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(url);
+        config.setDriverClassName("org.postgresql.Driver");
         config.setUsername(props.getProperty("USERNAME"));
         config.setPassword(props.getProperty("PASSWORD"));
-
         config.setMaximumPoolSize(10);
         config.setMinimumIdle(2);
-
-        this.dataSource = new HikariDataSource(config);
+        return config;
     }
 
     private Connection getConnection() throws SQLException {
