@@ -4,8 +4,6 @@ import java.sql.Array;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -16,7 +14,8 @@ import org.apache.commons.lang3.text.WordUtils;
 
 import static models.Messages.printErrorMessage;
 
-public class MovieDatabase {
+
+public final class MovieDatabase {
     private static final Set<String> ALLOWED_TABLES = Set.of("movies", "genres", "movie_genres");
     private static final Set<String> ALLOWED_ID_FIELDS = Set.of("movie_id", "genre_id");
 
@@ -29,6 +28,9 @@ public class MovieDatabase {
     private static final String FETCH_ALL_GENRES_SQL = "SELECT genre_id, genre FROM genres ORDER BY genre";
     private static final String FETCH_MOVIES_SQL = "SELECT movie_id, title, genres FROM view_all_movies";
 
+    private HikariDataSource dataSource;
+    private QueryBuilder queryBuilder;
+
     private static class Holder {
         private static final MovieDatabase INSTANCE = new MovieDatabase();
     }
@@ -37,19 +39,37 @@ public class MovieDatabase {
         return MovieDatabase.Holder.INSTANCE;
     }
 
-    private final HikariDataSource dataSource;
 
-    public void close() {
-        if (dataSource != null && !dataSource.isClosed()) {
-            dataSource.close();
-        }
-    }
+
+
 
     private MovieDatabase() {
-        Properties props = EnvLoader.loadProperties();
-        HikariConfig config = getConfig(props);
-        this.dataSource = new HikariDataSource(config);
-        Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+        try {
+            Properties props = EnvLoader.loadProperties();
+            HikariConfig config = getConfig(props);
+            dataSource = new HikariDataSource(config);
+            queryBuilder = new QueryBuilder(dataSource);
+            // Shutdown hook
+            Runtime.getRuntime().addShutdownHook(new Thread(this::closeConnections));
+        } catch (Exception ex){
+            System.err.println("There was an error establishing a connection " + ex.getMessage());
+
+        }
+
+
+    }
+
+    private void closeConnections() {
+
+        // Close the single connection
+        if (queryBuilder != null) {
+            queryBuilder.closeConnection();
+        }
+        // Close the pool
+        if (dataSource != null && !dataSource.isClosed()) {
+            System.out.println("2nd");
+            dataSource.close();
+        }
     }
 
     private HikariConfig getConfig(Properties props) {
@@ -66,110 +86,40 @@ public class MovieDatabase {
         return config;
     }
 
-    private Connection getConnection() throws SQLException {
+    public Connection getConnection() throws SQLException {
         return dataSource.getConnection(); // pooled connection
     }
 
-
     public List<String> fetchAvailableGenres() {
-        List<String> availableGenres = new ArrayList<>();
-        try (var con = getConnection();
-             var stmt = con.prepareStatement(FETCH_AVAILABLE_GENRES_SQL);
-             var rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                availableGenres.add(WordUtils.capitalizeFully(rs.getString(1)));
-            }
-
-        } catch (SQLException ex) {
-            throw new RuntimeException("Failed to fetch genres", ex);
-        }
-        return List.copyOf(availableGenres);
-
+        return queryBuilder.query(FETCH_AVAILABLE_GENRES_SQL, rs -> WordUtils.capitalizeFully(rs.getString(1)));
     }
+
 
     public List<Movie> fetchMovies() {
-        List<Movie> movies = new ArrayList<>();
-        try (var con = getConnection();
-             var stmt = con.prepareStatement(FETCH_MOVIES_SQL);
-             var rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                movies.add(new Movie(
-                        rs.getInt("movie_id"),
-                        rs.getString("title"),
-                        rs.getString("genres")
-                ));
-            }
-
-        } catch (SQLException ex) {
-            throw new RuntimeException("Failed to fetch movies", ex);
-        }
-
-        return movies;
+        return queryBuilder.query(FETCH_MOVIES_SQL, rs -> new Movie(
+                rs.getInt("movie_id"),
+                rs.getString("title"),
+                rs.getString("genres")
+        ));
     }
 
-
     public List<Genre> fetchAllGenres() {
-        try (var con = getConnection();
-             var stmt = con.prepareStatement(FETCH_ALL_GENRES_SQL);
-             var rs = stmt.executeQuery()) {
-            return Collections.unmodifiableList(
-                    new ArrayList<>() {{
-                        while (rs.next()) {
-                            add(new Genre(rs.getInt("genre_id"), rs.getString("genre")));
-                        }
-                    }}
-            );
-
-        } catch (SQLException ex) {
-            throw new RuntimeException("Failed to fetch genres", ex);
-        }
+        return queryBuilder.query(FETCH_ALL_GENRES_SQL, rs -> new Genre(
+                rs.getInt("genre_id"),
+                rs.getString("genre")
+        ));
     }
 
 
     public Optional<String> fetchMovieTitle(int movieId) {
-        try (var con = getConnection();
-             var stmt = con.prepareStatement(FETCH_MOVIE_TITLE_SQL)) {
-
-            stmt.setInt(1, movieId);
-
-            try (var rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return Optional.ofNullable(rs.getString("title"));
-                }
-            }
-
-            return Optional.empty();
-
-        } catch (SQLException ex) {
-            throw new RuntimeException(
-                    "Failed to fetch movie title for id: " + movieId, ex);
-        }
+        return queryBuilder.query(FETCH_MOVIE_TITLE_SQL, rs -> rs.getString("title"), movieId)
+                .stream()
+                .findFirst();
     }
 
 
     public List<String> fetchMovieGenres(int movieId) {
-        try (var con = getConnection();
-             var stmt = con.prepareStatement(FETCH_MOVIE_GENRES_SQL)) {
-
-            stmt.setInt(1, movieId);
-
-            try (var rs = stmt.executeQuery()) {
-
-                var genres = new ArrayList<String>();
-
-                while (rs.next()) {
-                    genres.add(rs.getString("genre"));
-                }
-
-                return List.copyOf(genres);
-            }
-
-        } catch (SQLException ex) {
-            throw new RuntimeException(
-                    "Failed to fetch genres for movie id: " + movieId, ex);
-        }
+        return queryBuilder.query(FETCH_MOVIE_GENRES_SQL, rs -> rs.getString("genre"), movieId);
     }
 
 
@@ -257,15 +207,10 @@ public class MovieDatabase {
 
         try (var con = getConnection();
              var stmt = con.prepareCall(ADD_MOVIE_WITH_GENRES_SQL)) {
-
             stmt.setString(1, title);
-
-            // PostgreSQL integer array
             Array genreArray = con.createArrayOf("INTEGER", genreIds.toArray(new Integer[0]));
             stmt.setArray(2, genreArray);
-
             stmt.execute();  // use execute() for procedures
-
             return true;
 
         } catch (SQLException ex) {
