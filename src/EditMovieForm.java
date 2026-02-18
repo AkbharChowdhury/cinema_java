@@ -28,21 +28,23 @@ public class EditMovieForm extends JFrame {
     private final JButton btnUndoGenre = ButtonFactory.createButton("Undo Genre", _ -> undoGenreSelection());
     private final JButton btnUndoTitle;
     private final List<Checkbox> genreCheckboxes;
-    private List<Checkbox> createGenreCheckboxes2() {
+    private List<Checkbox> createGenreCheckboxes() {
         return genres.stream()
-                .map(genre -> {
-                    Checkbox chk = new Checkbox(genre.name());
-                    chk.setState(originalSelectedGenres.contains(genre.name()));
-                    return chk;
-                })
+                .map(this::createCheckbox)
                 .toList();
+    }
+    private Checkbox createCheckbox(Genre genre){
+        Checkbox checkbox = new Checkbox(genre.name());
+        checkbox.setState(originalSelectedGenres.contains(genre.name()));
+        return checkbox;
+
     }
 
     public EditMovieForm(MainMenu mainMenuForm, int movieId) {
         MOVIE_ID = movieId;
         MOVIE_TITLE = db.fetchMovieTitle(MOVIE_ID).orElse("Movie title not found");
         btnUndoTitle = ButtonFactory.createButton("Undo title", _ -> txtTitle.setText(MOVIE_TITLE));
-        originalSelectedGenres =  db.fetchMovieGenres(MOVIE_ID);
+        originalSelectedGenres =  List.copyOf(db.fetchMovieGenres(MOVIE_ID));
         btnUpdateMovie.setToolTipText("Save changes to the movie");
         btnUndoGenre.setToolTipText("Undo changes to genres");
         btnUndoTitle.setToolTipText("Undo changes to the title");
@@ -61,7 +63,7 @@ public class EditMovieForm extends JFrame {
 
         middle.setLayout(new GridLayout(genres.size(), 2));
 
-        genreCheckboxes = createGenreCheckboxes2();
+        genreCheckboxes = createGenreCheckboxes();
         genreCheckboxes.forEach(middle::add);
 
         panel.add(top, BorderLayout.NORTH);
@@ -86,9 +88,8 @@ public class EditMovieForm extends JFrame {
     }
 
     private void showOriginalSelectedGenres() {
-        genreCheckboxes.stream()
-                .filter(cb -> originalSelectedGenres.contains(cb.getLabel()))
-                .forEach(cb -> cb.setState(true));
+        genreCheckboxes.forEach(cb -> cb.setState(originalSelectedGenres.contains(cb.getLabel())));
+
     }
 
 
