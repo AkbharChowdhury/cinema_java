@@ -138,7 +138,6 @@ public final class MovieDatabase {
             );
             throw new IllegalArgumentException(message);
         }
-
         String sql = "DELETE FROM " + tableName + " WHERE " + idField + " = ?";
 
         try (var con = getConnection();

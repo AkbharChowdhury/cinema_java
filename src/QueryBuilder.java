@@ -9,7 +9,6 @@ public final class QueryBuilder {
 
     public void closeConnection() {
         if (dataSource != null && !dataSource.isClosed()) {
-            System.out.println("1st");
             dataSource.close();
         }
 
