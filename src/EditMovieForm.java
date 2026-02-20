@@ -88,7 +88,7 @@ public class EditMovieForm extends JFrame {
     }
 
     private void showOriginalSelectedGenres() {
-        genreCheckboxes.forEach(cb -> cb.setState(originalSelectedGenres.contains(cb.getLabel())));
+        genreCheckboxes.forEach(checkbox -> checkbox.setState(originalSelectedGenres.contains(checkbox.getLabel())));
 
     }
 

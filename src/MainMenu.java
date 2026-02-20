@@ -39,7 +39,7 @@ public class MainMenu extends JFrame implements ActionListener {
     private final JTextField txtTitle = new JTextField(40);
     private final JComboBox<String> comboBoxGenres = new JComboBox<>();
     private final JTable table = new JTable();
-    private DefaultTableModel tableModel = new DefaultTableModel() {
+    private final DefaultTableModel tableModel = new DefaultTableModel(new String[]{"Title", "Genres"}, 0) {
 
         @Override
         public boolean isCellEditable(int row, int column) {
@@ -56,9 +56,6 @@ public class MainMenu extends JFrame implements ActionListener {
     private void tableProperties() {
         table.setModel(tableModel);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        List.of("Title", "Genres").forEach(tableModel::addColumn);
-        tableModel = (DefaultTableModel) table.getModel();
-
         table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
     }
 
