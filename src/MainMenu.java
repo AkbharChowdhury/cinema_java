@@ -95,13 +95,13 @@ public class MainMenu extends JFrame implements ActionListener {
         comboBoxGenres.addActionListener(this);
         buttons.forEach(button -> button.addActionListener(this));
 
-        populateList();
+        refreshTable();
 
         txtTitle.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
                 search.setTitle(txtTitle.getText());
-                populateList();
+                refreshTable();
             }
         });
         setVisible(true);
@@ -128,7 +128,7 @@ public class MainMenu extends JFrame implements ActionListener {
 
     private void genreAction() {
         search.setGenre(comboBoxGenres.getSelectedItem().toString());
-        populateList();
+        refreshTable();
     }
 
     private void editMovieAction() {
@@ -147,15 +147,24 @@ public class MainMenu extends JFrame implements ActionListener {
             return;
         }
         int movieId = getSelectedMovieId();
+        if (movieId == 0) return;
         removeMovie(movieId);
     }
 
     private final Supplier<Boolean> isSelectionRequired = () -> table.getSelectedRow() == -1;
 
     private int getSelectedMovieId() {
-        int selectedIndex = table.getSelectedRow();
-        movies = search.filter();
-        return movies.get(selectedIndex).id();
+        try {
+            int selectedIndex = table.getSelectedRow();
+            movies = search.filter();
+            return movies.get(selectedIndex).id();
+
+        } catch (IndexOutOfBoundsException boundsException) {
+            Messages.showError.accept("Movie error", "Sorry the selected movie cannot be found");
+
+        }
+        return 0;
+
     }
 
     private void showMovieRequiredMessage() {
@@ -164,10 +173,7 @@ public class MainMenu extends JFrame implements ActionListener {
 
 
     private void removeMovie(int movieId) {
-        if (isSelectionRequired.get()) {
-            showMovieRequiredMessage();
-            return;
-        }
+
         if (!Messages.hasConfirmed.apply("Are you sure you want to remove this movie?")) return;
         deleteMovie(movieId);
 
@@ -180,11 +186,11 @@ public class MainMenu extends JFrame implements ActionListener {
             return;
         }
         search.setMovies(db.fetchMovies());
-        populateList();
+        refreshTable();
     }
 
 
-    private void populateList() {
+    private void refreshTable() {
         tableModel.setRowCount(0);
         search.filter().forEach(this::addMovieRow);
 

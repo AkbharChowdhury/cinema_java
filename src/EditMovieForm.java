@@ -106,6 +106,11 @@ public class EditMovieForm extends JFrame {
         db.addGenresToMovie(MOVIE_ID, selectedGenreIds);
         Messages.message.accept("Movie updated");
         WindowUtils.openMainMenu(this, mainMenu);
+
+
+
+
+
     }
 
     void main() {

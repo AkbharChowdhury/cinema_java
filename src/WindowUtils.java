@@ -20,12 +20,13 @@ public final class WindowUtils {
     public static void openMainMenu(JFrame currentFrame, JFrame mainMenuFrame) {
         // Close existing main menu if it exists
         if (mainMenuFrame != null) mainMenuFrame.dispose();
+        // Open a new MainMenu
+        MainMenu mainMenu = new MainMenu();
+        mainMenu.setVisible(true);
 
         // Close the current frame
         if (currentFrame != null) currentFrame.dispose();
 
-        // Open a new MainMenu
-        MainMenu mainMenu = new MainMenu();
-        mainMenu.setVisible(true);
+
     }
 }
