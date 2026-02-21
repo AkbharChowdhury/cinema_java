@@ -8,10 +8,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 import java.util.function.Supplier;
 import javax.swing.DefaultComboBoxModel;
@@ -34,8 +32,6 @@ import models.SearchMovies;
 
 public class MainMenu extends JFrame implements ActionListener {
     private final Map<Integer, EditMovieForm> openEditors = new HashMap<>();
-
-    private Set<Integer> movieIdsTacking = new HashSet<>();
     private final MovieDatabase db = MovieDatabase.getInstance();
     private List<Movie> movies = db.fetchMovies();
     private final SearchMovies search = new SearchMovies(movies);

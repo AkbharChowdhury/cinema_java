@@ -4,6 +4,7 @@ import java.sql.Array;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -119,9 +120,11 @@ public final class MovieDatabase {
 
 
     public boolean deleteRecord(String tableName, String idField, int id) {
+        List<String> errors = new ArrayList<>();
 
         if (!ALLOWED_TABLES.contains(tableName)) {
-            throw new IllegalArgumentException("Invalid table name: " + tableName + " Must be of " + ALLOWED_TABLES);
+            errors.add("Invalid table name: " + tableName + " Must be of " + ALLOWED_TABLES);
+//            throw new IllegalArgumentException("Invalid table name: " + tableName + " Must be of " + ALLOWED_TABLES);
         }
 
         if (!ALLOWED_ID_FIELDS.contains(idField)) {
@@ -131,7 +134,12 @@ public final class MovieDatabase {
                     idField,
                     ALLOWED_ID_FIELDS
             );
-            throw new IllegalArgumentException(message);
+            errors.add(message);
+
+//            throw new IllegalArgumentException(message);
+        }
+        if(!errors.isEmpty()){
+            throw new IllegalArgumentException("Sorry unable to delete record, Please see error messages: " + errors);
         }
         //language=SQL
         String sql = String.format("DELETE FROM %s WHERE %s = ?", tableName, idField);
