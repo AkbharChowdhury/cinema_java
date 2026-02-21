@@ -118,13 +118,14 @@ public final class MovieDatabase {
         return queryBuilder.query(FETCH_MOVIE_GENRES_SQL, rs -> rs.getString("genre"), movieId);
     }
 
-
-    public boolean deleteRecord(String tableName, String idField, int id) {
+    private List<String> deleteRecordErrors(String tableName, String idField, int id) {
         List<String> errors = new ArrayList<>();
 
         if (!ALLOWED_TABLES.contains(tableName)) {
-            errors.add("Invalid table name: " + tableName + " Must be of " + ALLOWED_TABLES);
-//            throw new IllegalArgumentException("Invalid table name: " + tableName + " Must be of " + ALLOWED_TABLES);
+            String message = MessageFormat.format("""
+                    Invalid table name: "{0}" must be of {1}
+                    """, tableName, ALLOWED_TABLES);
+            errors.add(message);
         }
 
         if (!ALLOWED_ID_FIELDS.contains(idField)) {
@@ -136,11 +137,17 @@ public final class MovieDatabase {
             );
             errors.add(message);
 
-//            throw new IllegalArgumentException(message);
         }
-        if(!errors.isEmpty()){
+        return errors;
+
+    }
+
+    public boolean deleteRecord(String tableName, String idField, int id) {
+        List<String> errors = deleteRecordErrors(tableName, idField, id);
+        if (!errors.isEmpty()) {
             throw new IllegalArgumentException("Sorry unable to delete record, Please see error messages: " + errors);
         }
+
         //language=SQL
         String sql = String.format("DELETE FROM %s WHERE %s = ?", tableName, idField);
         try (var con = getConnection();
