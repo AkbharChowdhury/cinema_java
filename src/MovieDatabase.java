@@ -145,7 +145,7 @@ public final class MovieDatabase {
     public boolean deleteRecord(String tableName, String idField, int id) {
         List<String> errors = deleteRecordErrors(tableName, idField, id);
         if (!errors.isEmpty()) {
-            throw new IllegalArgumentException("Sorry unable to delete record, Please see error messages: " + errors);
+            throw new IllegalArgumentException("Unable to delete record due to: " + String.join("; ", errors));
         }
 
         //language=SQL
