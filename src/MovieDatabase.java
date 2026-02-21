@@ -16,16 +16,20 @@ import static models.Messages.printErrorMessage;
 
 
 public final class MovieDatabase {
+
     private static final Set<String> ALLOWED_TABLES = Set.of("movies", "genres", "movie_genres");
     private static final Set<String> ALLOWED_ID_FIELDS = Set.of("movie_id", "genre_id");
-
     private static final String UPDATE_MOVIE_TITLE_SQL = "UPDATE movies SET title = ? WHERE movie_id = ?";
     private static final String ADD_MOVIE_WITH_GENRES_SQL = "CALL pr_add_movie_and_genres(?, ?)";
-
+    //language=SQL
     private static final String FETCH_AVAILABLE_GENRES_SQL = "SELECT genre FROM available_genres ORDER BY genre";
+    //language=SQL
     private static final String FETCH_MOVIE_GENRES_SQL = "SELECT genre FROM fn_get_selected_movie_genres(?) ORDER BY genre";
+    //language=SQL
     private static final String FETCH_MOVIE_TITLE_SQL = "SELECT title FROM movies WHERE movie_id = ?";
+    //language=SQL
     private static final String FETCH_ALL_GENRES_SQL = "SELECT genre_id, genre FROM genres ORDER BY genre";
+    //language=SQL
     private static final String FETCH_MOVIES_SQL = "SELECT movie_id, title, genres FROM view_all_movies";
 
     private HikariDataSource dataSource;
@@ -47,7 +51,7 @@ public final class MovieDatabase {
             queryBuilder = new QueryBuilder(dataSource);
             // Shutdown hook
             Runtime.getRuntime().addShutdownHook(new Thread(this::closeConnection));
-        } catch (Exception ex){
+        } catch (Exception ex) {
             System.err.println("There was an error establishing a connection " + ex.getMessage());
         }
 
@@ -129,12 +133,10 @@ public final class MovieDatabase {
             );
             throw new IllegalArgumentException(message);
         }
-        String s = String.format("DELETE FROM ", "s");
-        String sql = "DELETE FROM " + tableName + " WHERE " + idField + " = ?";
-
+        //language=SQL
+        String sql = String.format("DELETE FROM %s WHERE %s = ?", tableName, idField);
         try (var con = getConnection();
              var stmt = con.prepareStatement(sql)) {
-
             stmt.setInt(1, id);
             return stmt.executeUpdate() != 0;
 
