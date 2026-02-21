@@ -11,6 +11,7 @@ import java.util.Properties;
 import java.util.Set;
 import models.Genre;
 import models.Movie;
+import models.MovieFormValidator;
 import org.apache.commons.lang3.text.WordUtils;
 
 import static models.Messages.printErrorMessage;
@@ -35,7 +36,8 @@ public final class MovieDatabase {
     private static final String FETCH_MOVIES_SQL = "SELECT movie_id, title, genres FROM view_all_movies";
     //language=SQL
     private static final String INSERT_MOVIE_GENRES_SQL = "INSERT INTO movie_genres(genre_id, movie_id) VALUES(?, ?)";
-
+    //language=SQL
+    private static final String DELETE_SQL = "DELETE FROM %s WHERE %s = ?";
 
     private HikariDataSource dataSource;
     private QueryBuilder queryBuilder;
@@ -122,7 +124,7 @@ public final class MovieDatabase {
         return queryBuilder.query(FETCH_MOVIE_GENRES_SQL, rs -> rs.getString("genre"), movieId);
     }
 
-    private List<String> deleteRecordErrors(String tableName, String idField, int id) {
+    private List<String> deleteRecordErrors(String tableName, String idField) {
         List<String> errors = new ArrayList<>();
 
         if (!ALLOWED_TABLES.contains(tableName)) {
@@ -147,22 +149,19 @@ public final class MovieDatabase {
     }
 
     public boolean deleteRecord(String tableName, String idField, int id) {
-        List<String> errors = deleteRecordErrors(tableName, idField, id);
-        if (!errors.isEmpty()) {
+        List<String> errors = deleteRecordErrors(tableName, idField);
+        if (!errors.isEmpty())
             throw new IllegalArgumentException("Unable to delete record due to: " + String.join("; ", errors));
-        }
 
-        //language=SQL
-        String sql = String.format("DELETE FROM %s WHERE %s = ?", tableName, idField);
+
+        String sql = String.format(DELETE_SQL, tableName, idField);
         try (var con = getConnection();
              var stmt = con.prepareStatement(sql)) {
             stmt.setInt(1, id);
             return stmt.executeUpdate() != 0;
 
         } catch (SQLException ex) {
-            throw new RuntimeException(
-                    "Failed to delete record from " + tableName +
-                            " with id: " + id, ex);
+            throw new RuntimeException("Failed to delete record from " + tableName + " with id: " + id, ex);
         }
     }
 
@@ -184,9 +183,7 @@ public final class MovieDatabase {
 
     public void updateMovieTitle(String newTitle, int movieId) {
 
-        if (newTitle == null || newTitle.isBlank()) {
-            throw new IllegalArgumentException("Movie title cannot be empty");
-        }
+        if (newTitle == null || newTitle.isBlank()) throw new IllegalArgumentException("Movie title cannot be empty");
 
         try (var con = getConnection();
              var stmt = con.prepareStatement(UPDATE_MOVIE_TITLE_SQL)) {
@@ -196,25 +193,19 @@ public final class MovieDatabase {
 
             int affectedRows = stmt.executeUpdate();
 
-            if (affectedRows == 0) {
-                throw new IllegalArgumentException(
-                        MessageFormat.format("This movie id {0} does not exist", movieId));
-            }
+            if (affectedRows == 0)
+                throw new IllegalArgumentException(MessageFormat.format("This movie id {0} does not exist", movieId));
+
 
         } catch (SQLException ex) {
-            throw new RuntimeException(
-                    "Failed to update movie title for movie_id: " + movieId, ex);
+            throw new RuntimeException("Failed to update movie title for movie_id: " + movieId, ex);
         }
     }
 
     public boolean addMovieWithGenres(String title, Set<Integer> genreIds) {
-
-        if (title == null || title.isBlank()) {
-            throw new IllegalArgumentException("Movie title cannot be empty");
-        }
-
-        if (genreIds == null || genreIds.isEmpty()) {
-            throw new IllegalArgumentException("At least one genre must be provided");
+        List<String> errors = MovieFormValidator.addMovieFormErrors(title, genreIds);
+        if (!errors.isEmpty()) {
+            throw new IllegalArgumentException("Cannot add the movie because of the following: " + errors);
         }
 
         try (var con = getConnection();
