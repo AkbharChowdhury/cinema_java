@@ -17,10 +17,11 @@ import static models.Messages.printErrorMessage;
 
 
 public final class MovieDatabase {
-
     private static final Set<String> ALLOWED_TABLES = Set.of("movies", "genres", "movie_genres");
     private static final Set<String> ALLOWED_ID_FIELDS = Set.of("movie_id", "genre_id");
+    // language=SQL
     private static final String UPDATE_MOVIE_TITLE_SQL = "UPDATE movies SET title = ? WHERE movie_id = ?";
+    //language=SQL
     private static final String ADD_MOVIE_WITH_GENRES_SQL = "CALL pr_add_movie_and_genres(?, ?)";
     //language=SQL
     private static final String FETCH_AVAILABLE_GENRES_SQL = "SELECT genre FROM available_genres ORDER BY genre";
@@ -32,6 +33,9 @@ public final class MovieDatabase {
     private static final String FETCH_ALL_GENRES_SQL = "SELECT genre_id, genre FROM genres ORDER BY genre";
     //language=SQL
     private static final String FETCH_MOVIES_SQL = "SELECT movie_id, title, genres FROM view_all_movies";
+    //language=SQL
+    private static final String INSERT_MOVIE_GENRES_SQL = "INSERT INTO movie_genres(genre_id, movie_id) VALUES(?, ?)";
+
 
     private HikariDataSource dataSource;
     private QueryBuilder queryBuilder;
@@ -166,7 +170,7 @@ public final class MovieDatabase {
     public void addGenresToMovie(int movieId, List<Integer> genreIds) {
         try (Connection con = getConnection()) {
             for (int genreID : genreIds) {
-                var stmt = con.prepareStatement("INSERT INTO movie_genres(genre_id, movie_id) VALUES(?, ?)");
+                var stmt = con.prepareStatement(INSERT_MOVIE_GENRES_SQL);
                 stmt.setInt(1, genreID);
                 stmt.setInt(2, movieId);
                 stmt.executeUpdate();

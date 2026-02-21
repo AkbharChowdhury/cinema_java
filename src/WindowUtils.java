@@ -5,7 +5,6 @@ import java.util.function.Consumer;
 
 public final class WindowUtils {
 
-
     /**
      * Apply autofocus to a component after the EventQueue processes the event.
      */
