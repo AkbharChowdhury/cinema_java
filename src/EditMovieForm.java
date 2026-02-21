@@ -9,6 +9,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 import models.ButtonFactory;
 import models.Genre;
 import models.GenreSelectionUtils;
@@ -70,7 +71,7 @@ public class EditMovieForm extends JFrame {
         panel.add(middle, BorderLayout.CENTER);
         panel.add(btnUpdateMovie, BorderLayout.SOUTH);
         setContentPane(panel);
-        setDefaultCloseOperation(MainMenuState.getCloseOperation());
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setSize(800, 400);
 
         showOriginalSelectedGenres();
@@ -106,10 +107,6 @@ public class EditMovieForm extends JFrame {
         db.addGenresToMovie(MOVIE_ID, selectedGenreIds);
         Messages.message.accept("Movie updated");
         WindowUtils.openMainMenu(this, mainMenu);
-
-
-
-
 
     }
 

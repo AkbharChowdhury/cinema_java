@@ -39,10 +39,6 @@ public final class MovieDatabase {
         return MovieDatabase.Holder.INSTANCE;
     }
 
-
-
-
-
     private MovieDatabase() {
         try {
             Properties props = EnvLoader.loadProperties();
@@ -50,24 +46,17 @@ public final class MovieDatabase {
             dataSource = new HikariDataSource(config);
             queryBuilder = new QueryBuilder(dataSource);
             // Shutdown hook
-            Runtime.getRuntime().addShutdownHook(new Thread(this::closeConnections));
+            Runtime.getRuntime().addShutdownHook(new Thread(this::closeConnection));
         } catch (Exception ex){
             System.err.println("There was an error establishing a connection " + ex.getMessage());
-
         }
 
 
     }
 
-    private void closeConnections() {
-
-        // Close the single connection
-        if (queryBuilder != null) {
-            queryBuilder.closeConnection();
-        }
+    private void closeConnection() {
         // Close the pool
         if (dataSource != null && !dataSource.isClosed()) {
-            System.out.println("2nd");
             dataSource.close();
         }
     }
@@ -83,6 +72,8 @@ public final class MovieDatabase {
         config.setPassword(props.getProperty("PASSWORD"));
         config.setMaximumPoolSize(10);
         config.setMinimumIdle(2);
+        config.setConnectionTimeout(300_000);
+        config.setLeakDetectionThreshold(300_000);
         return config;
     }
 
@@ -138,6 +129,7 @@ public final class MovieDatabase {
             );
             throw new IllegalArgumentException(message);
         }
+        String s = String.format("DELETE FROM ", "s");
         String sql = "DELETE FROM " + tableName + " WHERE " + idField + " = ?";
 
         try (var con = getConnection();

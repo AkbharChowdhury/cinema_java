@@ -4,9 +4,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 import java.util.function.Supplier;
 import javax.swing.DefaultComboBoxModel;
@@ -19,6 +24,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import models.ButtonFactory;
 import models.GenreSelectionUtils;
@@ -27,6 +33,9 @@ import models.Movie;
 import models.SearchMovies;
 
 public class MainMenu extends JFrame implements ActionListener {
+    private final Map<Integer, EditMovieForm> openEditors = new HashMap<>();
+
+    private Set<Integer> movieIdsTacking = new HashSet<>();
     private final MovieDatabase db = MovieDatabase.getInstance();
     private List<Movie> movies = db.fetchMovies();
     private final SearchMovies search = new SearchMovies(movies);
@@ -113,8 +122,11 @@ public class MainMenu extends JFrame implements ActionListener {
         return genres;
     }
 
-    void main() {
-
+    static void main() {
+        SwingUtilities.invokeLater(() -> {
+            MainMenu view = new MainMenu();
+            view.setVisible(true);
+        });
     }
 
 
@@ -136,9 +148,39 @@ public class MainMenu extends JFrame implements ActionListener {
             showMovieRequiredMessage();
             return;
         }
+        movies = search.filter();
         int movieId = getSelectedMovieId();
-        new EditMovieForm(this, movieId).setVisible(true);
+        openEditMovieForm(movieId);
 
+    }
+    private void openExistingForm(JFrame existing){
+        existing.toFront();
+        existing.requestFocus();
+        existing.setState(JFrame.NORMAL); // if minimized
+
+
+    }
+
+    private void openEditMovieForm(int movieId) {
+        EditMovieForm existingForm = openEditors.get(movieId);
+        if (existingForm != null) {
+            openExistingForm(existingForm);
+            return;
+        }
+
+        openMovie(movieId);
+    }
+    private void openMovie(int movieId){
+        EditMovieForm form = new EditMovieForm(this, movieId);
+        openEditors.put(movieId, form);
+        form.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                openEditors.remove(movieId);
+            }
+        });
+
+        form.setVisible(true);
     }
 
     private void removeMovieAction() {
@@ -146,6 +188,7 @@ public class MainMenu extends JFrame implements ActionListener {
             showMovieRequiredMessage();
             return;
         }
+
         int movieId = getSelectedMovieId();
         if (movieId == 0) return;
         removeMovie(movieId);
@@ -156,7 +199,6 @@ public class MainMenu extends JFrame implements ActionListener {
     private int getSelectedMovieId() {
         try {
             int selectedIndex = table.getSelectedRow();
-            movies = search.filter();
             return movies.get(selectedIndex).id();
 
         } catch (IndexOutOfBoundsException boundsException) {
@@ -173,10 +215,8 @@ public class MainMenu extends JFrame implements ActionListener {
 
 
     private void removeMovie(int movieId) {
-
         if (!Messages.hasConfirmed.apply("Are you sure you want to remove this movie?")) return;
         deleteMovie(movieId);
-
     }
 
     private void deleteMovie(int movieId) {
