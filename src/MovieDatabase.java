@@ -165,17 +165,19 @@ public final class MovieDatabase {
         }
     }
 
-
     public void addGenresToMovie(int movieId, List<Integer> genreIds) {
-        try (Connection con = getConnection()) {
+        try (Connection con = getConnection();
+             var stmt = con.prepareStatement(INSERT_MOVIE_GENRES_SQL)) {
             for (int genreID : genreIds) {
-                var stmt = con.prepareStatement(INSERT_MOVIE_GENRES_SQL);
                 stmt.setInt(1, genreID);
                 stmt.setInt(2, movieId);
-                stmt.executeUpdate();
+                stmt.addBatch();   // Add to batch instead of executing immediately
             }
 
+            stmt.executeBatch(); // Execute all at once
+
         } catch (SQLException ex) {
+
             printErrorMessage.accept(ex.getMessage());
         }
     }
