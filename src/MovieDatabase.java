@@ -4,7 +4,6 @@ import java.sql.Array;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -12,6 +11,7 @@ import java.util.Set;
 import models.Genre;
 import models.Movie;
 import models.MovieFormValidator;
+import models.RecordValidator;
 import org.apache.commons.lang3.text.WordUtils;
 
 import static models.Messages.printErrorMessage;
@@ -61,8 +61,6 @@ public final class MovieDatabase {
         } catch (Exception ex) {
             System.err.println("There was an error establishing a connection " + ex.getMessage());
         }
-
-
     }
 
     private void closeConnection() {
@@ -124,42 +122,17 @@ public final class MovieDatabase {
         return queryBuilder.query(FETCH_MOVIE_GENRES_SQL, rs -> rs.getString("genre"), movieId);
     }
 
-    private List<String> deleteRecordErrors(String tableName, String idField) {
-        List<String> errors = new ArrayList<>();
-
-        if (!ALLOWED_TABLES.contains(tableName)) {
-            String message = MessageFormat.format("""
-                    Invalid table name: "{0}" must be of {1}
-                    """, tableName, ALLOWED_TABLES);
-            errors.add(message);
-        }
-
-        if (!ALLOWED_ID_FIELDS.contains(idField)) {
-            String message = MessageFormat.format("""
-                            Invalid id field: "{0}". Must be one of {1}.
-                            """.trim(),
-                    idField,
-                    ALLOWED_ID_FIELDS
-            );
-            errors.add(message);
-
-        }
-        return errors;
-
-    }
 
     public boolean deleteRecord(String tableName, String idField, int id) {
-        List<String> errors = deleteRecordErrors(tableName, idField);
+        List<String> errors = RecordValidator.deleteRecordErrors(tableName, idField);
         if (!errors.isEmpty())
             throw new IllegalArgumentException("Unable to delete record due to: " + String.join("; ", errors));
-
 
         String sql = String.format(DELETE_SQL, tableName, idField);
         try (var con = getConnection();
              var stmt = con.prepareStatement(sql)) {
             stmt.setInt(1, id);
             return stmt.executeUpdate() != 0;
-
         } catch (SQLException ex) {
             throw new RuntimeException("Failed to delete record from " + tableName + " with id: " + id, ex);
         }
@@ -194,7 +167,6 @@ public final class MovieDatabase {
             stmt.setInt(2, movieId);
 
             int affectedRows = stmt.executeUpdate();
-
             if (affectedRows == 0)
                 throw new IllegalArgumentException(MessageFormat.format("This movie id {0} does not exist", movieId));
 
