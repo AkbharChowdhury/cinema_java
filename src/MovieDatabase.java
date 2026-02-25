@@ -139,7 +139,7 @@ public final class MovieDatabase {
     }
 
     public void addGenresToMovie(int movieId, List<Integer> genreIds) {
-        try (Connection con = getConnection();
+        try (var con = getConnection();
              var stmt = con.prepareStatement(INSERT_MOVIE_GENRES_SQL)) {
             for (int genreID : genreIds) {
                 stmt.setInt(1, genreID);
@@ -162,14 +162,11 @@ public final class MovieDatabase {
 
         try (var con = getConnection();
              var stmt = con.prepareStatement(UPDATE_MOVIE_TITLE_SQL)) {
-
             stmt.setString(1, newTitle);
             stmt.setInt(2, movieId);
 
             int affectedRows = stmt.executeUpdate();
-            if (affectedRows == 0)
-                throw new IllegalArgumentException(MessageFormat.format("This movie id {0} does not exist", movieId));
-
+            if (affectedRows == 0) throw new IllegalArgumentException(MessageFormat.format("This movie id {0} does not exist", movieId));
 
         } catch (SQLException ex) {
             throw new RuntimeException("Failed to update movie title for movie_id: " + movieId, ex);
@@ -178,9 +175,7 @@ public final class MovieDatabase {
 
     public boolean addMovieWithGenres(String title, Set<Integer> genreIds) {
         List<String> errors = MovieFormValidator.addMovieFormErrors(title, genreIds);
-        if (!errors.isEmpty()) {
-            throw new IllegalArgumentException("Cannot add the movie because of the following: " + errors);
-        }
+        if (!errors.isEmpty()) throw new IllegalArgumentException("Cannot add the movie because of the following: " + errors);
 
         try (var con = getConnection();
              var stmt = con.prepareCall(ADD_MOVIE_WITH_GENRES_SQL)) {

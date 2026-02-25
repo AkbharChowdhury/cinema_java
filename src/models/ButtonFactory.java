@@ -19,9 +19,7 @@ public final class ButtonFactory {
 
         JButton button = new JButton(text);
         button.setCursor(HAND_CURSOR);
-        if (listener != null) {
-            button.addActionListener(listener);
-        }
+        if (listener != null) button.addActionListener(listener);
         return button;
     }
 

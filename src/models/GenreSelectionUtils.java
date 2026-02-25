@@ -6,11 +6,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public final class GenreSelectionUtils {
-    private GenreSelectionUtils() {}
+    private GenreSelectionUtils() {
+    }
 
     public static final String ANY_GENRE = "Any";
 
-    /** Returns a list of genres corresponding to selected checkboxes */
+    /**
+     * Returns a list of genres corresponding to selected checkboxes
+     */
     public static List<Genre> getSelectedGenres(List<Checkbox> checkboxes, List<Genre> genres) {
         Set<String> selectedLabels = checkboxes.stream()
                 .filter(Checkbox::getState)
@@ -18,11 +21,13 @@ public final class GenreSelectionUtils {
                 .collect(Collectors.toSet());
 
         return genres.stream()
-                .filter(g -> selectedLabels.contains(g.name()))
+                .filter(genre -> selectedLabels.contains(genre.name()))
                 .toList();
     }
 
-    /** Checks if any genre checkbox is selected */
+    /**
+     * Checks if any genre checkbox is selected
+     */
     public static boolean hasSelectedGenre(List<Checkbox> checkboxes) {
         return checkboxes.stream().anyMatch(Checkbox::getState);
     }
