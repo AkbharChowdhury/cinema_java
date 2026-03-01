@@ -8,7 +8,7 @@ public final class GenreCheckboxFactory {
     private GenreCheckboxFactory() {}
 
     public static List<Checkbox> create(List<Genre> genres) {
-        Objects.requireNonNull(genres, "Genres must not be null");
+        Objects.requireNonNull(genres, "Genres must not be empty");
         return genres.stream()
                 .map(genre -> new Checkbox(genre.name()))
                 .toList();

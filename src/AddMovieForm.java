@@ -1,9 +1,6 @@
-
-
 import java.awt.BorderLayout;
 import java.awt.Checkbox;
 import java.awt.GridLayout;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import javax.swing.JButton;
@@ -21,7 +18,7 @@ import models.MovieFormValidator;
 public class AddMovieForm extends JFrame {
     private static MainMenu mainMenu;
     private final MovieDatabase db = MovieDatabase.getInstance();
-    private final List<Genre> genres = Collections.unmodifiableList(db.fetchAllGenres());
+    private final List<Genre> genres = db.fetchAllGenres();
     private final JTextField txtTitle = new JTextField(20);
     private final JButton btnAddMovie = ButtonFactory.createButton("Add Movie", _ -> handleAddMovie());
     private final List<Checkbox> genreCheckboxes;
