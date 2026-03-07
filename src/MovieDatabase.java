@@ -174,7 +174,7 @@ public final class MovieDatabase {
     }
 
     public boolean addMovieWithGenres(String title, Set<Integer> genreIds) {
-        List<String> errors = MovieFormValidator.addMovieFormErrors(title, genreIds);
+        List<String> errors = MovieFormValidator.validate(title, genreIds);
         if (!errors.isEmpty()) throw new IllegalArgumentException("Cannot add the movie because of the following: " + errors);
 
         try (var con = getConnection();

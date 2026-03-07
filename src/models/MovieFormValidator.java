@@ -11,7 +11,7 @@ public final class MovieFormValidator {
 
     }
 
-    public static List<String> addMovieFormErrors(String title, Set<Integer> genreIds) {
+    public static List<String> validate(String title, Set<Integer> genreIds) {
         ArrayList<String> errors = new ArrayList<>();
         if (title == null || title.isBlank()) {
             errors.add("Title cannot be empty");
@@ -24,7 +24,7 @@ public final class MovieFormValidator {
     }
 
 
-    public static boolean isFormValid(JTextField txtTitle, List<Checkbox> genreCheckboxes) {
+    public static boolean validateForm(JTextField txtTitle, List<Checkbox> genreCheckboxes) {
         boolean hasSelectedGenre = GenreSelectionUtils.hasSelectedGenre(genreCheckboxes);
         String title = txtTitle.getText();
         if (title == null || title.isBlank()) {

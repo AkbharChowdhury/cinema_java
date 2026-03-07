@@ -16,10 +16,10 @@ public final class ButtonFactory {
 
     public static JButton createButton(String text, ActionListener listener) {
         Objects.requireNonNull(text, "Button text must not be null");
-
         JButton button = new JButton(text);
         button.setCursor(HAND_CURSOR);
-        if (listener != null) button.addActionListener(listener);
+        if (listener != null)
+            button.addActionListener(listener);
         return button;
     }
 

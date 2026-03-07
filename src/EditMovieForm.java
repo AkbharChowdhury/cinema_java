@@ -95,7 +95,7 @@ public class EditMovieForm extends JFrame {
 
 
     private void updateMovieAction() {
-        if (!MovieFormValidator.isFormValid(txtTitle, genreCheckboxes)) return;
+        if (!MovieFormValidator.validateForm(txtTitle, genreCheckboxes)) return;
         updateMovie();
     }
 

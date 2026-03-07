@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.Objects;
 
 public final class GenreCheckboxFactory {
-    private GenreCheckboxFactory() {}
+    private GenreCheckboxFactory() {
+    }
 
     public static List<Checkbox> create(List<Genre> genres) {
         Objects.requireNonNull(genres, "Genres must not be empty");
