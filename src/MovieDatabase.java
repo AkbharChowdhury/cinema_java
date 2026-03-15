@@ -167,7 +167,8 @@ public final class MovieDatabase {
         if (!errors.isEmpty())
             throw new IllegalArgumentException("Cannot add the movie because of the following: " + errors);
 
-        try (var con = getConnection(); var stmt = con.prepareCall(ADD_MOVIE_WITH_GENRES_SQL)) {
+        try (var con = getConnection();
+             var stmt = con.prepareCall(ADD_MOVIE_WITH_GENRES_SQL)) {
             stmt.setString(1, title);
             Array genreArray = con.createArrayOf("INTEGER", genreIds.toArray(new Integer[0]));
             stmt.setArray(2, genreArray);
