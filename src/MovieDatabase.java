@@ -89,6 +89,15 @@ public final class MovieDatabase {
     public Connection getConnection() throws SQLException {
         return dataSource.getConnection(); // pooled connection
     }
+    private int executeUpdate(String sql, SQLConsumer<PreparedStatement> parameterSetter) {
+        try (var con = getConnection();
+             var stmt = con.prepareStatement(sql)) {
+            parameterSetter.accept(stmt);
+            return stmt.executeUpdate();
+        } catch (SQLException ex) {
+            throw new RuntimeException("Database update failed: ", ex);
+        }
+    }
 
     public List<String> fetchAvailableGenres() {
         return queryBuilder.query(FETCH_AVAILABLE_GENRES_SQL, rs -> WordUtils.capitalizeFully(rs.getString(1)));
@@ -119,16 +128,6 @@ public final class MovieDatabase {
         return executeUpdate(sql, stmt -> stmt.setInt(1, id)) != 0;
     }
 
-
-    private int executeUpdate(String sql, SQLConsumer<PreparedStatement> parameterSetter) {
-        try (var con = getConnection();
-             var stmt = con.prepareStatement(sql)) {
-            parameterSetter.accept(stmt);
-            return stmt.executeUpdate();
-        } catch (SQLException ex) {
-            throw new RuntimeException("Database update failed: ", ex);
-        }
-    }
 
 
     public void addGenresToMovie(int movieId, List<Integer> genreIds) {
