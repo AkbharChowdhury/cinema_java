@@ -144,7 +144,7 @@ public class MainMenu extends JFrame implements ActionListener {
             showMovieRequiredMessage();
             return;
         }
-        movies = search.filter();
+
         int movieId = getSelectedMovieId();
         openEditMovieForm(movieId);
 
@@ -194,6 +194,7 @@ public class MainMenu extends JFrame implements ActionListener {
 
     private int getSelectedMovieId() {
         try {
+            movies = search.filter();
             int selectedIndex = table.getSelectedRow();
             return movies.get(selectedIndex).id();
 

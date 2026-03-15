@@ -1,4 +1,5 @@
 import com.zaxxer.hikari.HikariDataSource;
+import interfaces.RowMapper;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -54,5 +55,6 @@ public final class QueryBuilder {
 
         }
     }
+
 }
 

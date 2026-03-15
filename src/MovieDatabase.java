@@ -1,7 +1,9 @@
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import interfaces.SQLConsumer;
 import java.sql.Array;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.List;
@@ -16,10 +18,8 @@ import org.apache.commons.lang3.text.WordUtils;
 
 import static models.Messages.printErrorMessage;
 
-
 public final class MovieDatabase {
-    private static final Set<String> ALLOWED_TABLES = Set.of("movies", "genres", "movie_genres");
-    private static final Set<String> ALLOWED_ID_FIELDS = Set.of("movie_id", "genre_id");
+
     // language=SQL
     private static final String UPDATE_MOVIE_TITLE_SQL = "UPDATE movies SET title = ? WHERE movie_id = ?";
     //language=SQL
@@ -49,6 +49,7 @@ public final class MovieDatabase {
     public static MovieDatabase getInstance() {
         return MovieDatabase.Holder.INSTANCE;
     }
+
 
     private MovieDatabase() {
         try {
@@ -96,25 +97,16 @@ public final class MovieDatabase {
 
 
     public List<Movie> fetchMovies() {
-        return queryBuilder.query(FETCH_MOVIES_SQL, rs -> new Movie(
-                rs.getInt("movie_id"),
-                rs.getString("title"),
-                rs.getString("genres")
-        ));
+        return queryBuilder.query(FETCH_MOVIES_SQL, rs -> new Movie(rs.getInt("movie_id"), rs.getString("title"), rs.getString("genres")));
     }
 
     public List<Genre> fetchAllGenres() {
-        return queryBuilder.query(FETCH_ALL_GENRES_SQL, rs -> new Genre(
-                rs.getInt("genre_id"),
-                rs.getString("genre")
-        ));
+        return queryBuilder.query(FETCH_ALL_GENRES_SQL, rs -> new Genre(rs.getInt("genre_id"), rs.getString("genre")));
     }
 
 
     public Optional<String> fetchMovieTitle(int movieId) {
-        return queryBuilder.query(FETCH_MOVIE_TITLE_SQL, rs -> rs.getString("title"), movieId)
-                .stream()
-                .findFirst();
+        return queryBuilder.query(FETCH_MOVIE_TITLE_SQL, rs -> rs.getString("title"), movieId).stream().findFirst();
     }
 
 
@@ -124,23 +116,48 @@ public final class MovieDatabase {
 
 
     public boolean deleteRecord(String tableName, String idField, int id) {
-        List<String> errors = RecordValidator.deleteRecordErrors(tableName, idField);
-        if (!errors.isEmpty())
-            throw new IllegalArgumentException("Unable to delete record due to: " + String.join("; ", errors));
-
+        RecordValidator.validateDelete(tableName, idField);
         String sql = String.format(DELETE_SQL, tableName, idField);
-        try (var con = getConnection();
+        return executeUpdate(sql, stmt -> stmt.setInt(1, id)) != 0;
+    }
+
+//        RecordValidator.validateDelete(tableName, idField);
+//        String sql = String.format(DELETE_SQL, tableName, idField);
+//        try (var con = getConnection();
+//             var stmt = con.prepareStatement(sql)) {
+//            stmt.setInt(1, id);
+//
+//            System.out.println("SQL: " + stmt.toString());
+//
+//            return stmt.executeUpdate() != 0;
+//        } catch (SQLException ex) {
+//            throw new RuntimeException(String.format("Failed to delete from %s where %s = %d",tableName, idField, id), ex);
+//        }
+
+
+    private int executeUpdate(String sql, SQLConsumer<PreparedStatement> parameterSetter) {
+        try (var con = this.getConnection();
              var stmt = con.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            return stmt.executeUpdate() != 0;
+            parameterSetter.accept(stmt);
+            System.out.println(stmt.toString());
+            return stmt.executeUpdate();
         } catch (SQLException ex) {
-            throw new RuntimeException("Failed to delete record from " + tableName + " with id: " + id, ex);
+            throw new RuntimeException("Database update failed: ", ex);
         }
     }
 
+
+//    public boolean deleteRecord1(String tableName, String idField, int id) {
+//
+//        RecordValidator.validateDelete(tableName, idField);
+//
+//        String sql = String.format(DELETE_SQL, tableName, idField);
+//
+//        return executeUpdate(sql, stmt -> stmt.setInt(1, id)) != 0;
+//    }
+
     public void addGenresToMovie(int movieId, List<Integer> genreIds) {
-        try (var con = getConnection();
-             var stmt = con.prepareStatement(INSERT_MOVIE_GENRES_SQL)) {
+        try (var con = getConnection(); var stmt = con.prepareStatement(INSERT_MOVIE_GENRES_SQL)) {
             for (int genreID : genreIds) {
                 stmt.setInt(1, genreID);
                 stmt.setInt(2, movieId);
@@ -160,13 +177,13 @@ public final class MovieDatabase {
 
         if (newTitle == null || newTitle.isBlank()) throw new IllegalArgumentException("Movie title cannot be empty");
 
-        try (var con = getConnection();
-             var stmt = con.prepareStatement(UPDATE_MOVIE_TITLE_SQL)) {
+        try (var con = getConnection(); var stmt = con.prepareStatement(UPDATE_MOVIE_TITLE_SQL)) {
             stmt.setString(1, newTitle);
             stmt.setInt(2, movieId);
 
             int affectedRows = stmt.executeUpdate();
-            if (affectedRows == 0) throw new IllegalArgumentException(MessageFormat.format("This movie id {0} does not exist", movieId));
+            if (affectedRows == 0)
+                throw new IllegalArgumentException(MessageFormat.format("This movie id {0} does not exist", movieId));
 
         } catch (SQLException ex) {
             throw new RuntimeException("Failed to update movie title for movie_id: " + movieId, ex);
@@ -175,10 +192,10 @@ public final class MovieDatabase {
 
     public boolean addMovieWithGenres(String title, Set<Integer> genreIds) {
         List<String> errors = MovieFormValidator.validate(title, genreIds);
-        if (!errors.isEmpty()) throw new IllegalArgumentException("Cannot add the movie because of the following: " + errors);
+        if (!errors.isEmpty())
+            throw new IllegalArgumentException("Cannot add the movie because of the following: " + errors);
 
-        try (var con = getConnection();
-             var stmt = con.prepareCall(ADD_MOVIE_WITH_GENRES_SQL)) {
+        try (var con = getConnection(); var stmt = con.prepareCall(ADD_MOVIE_WITH_GENRES_SQL)) {
             stmt.setString(1, title);
             Array genreArray = con.createArrayOf("INTEGER", genreIds.toArray(new Integer[0]));
             stmt.setArray(2, genreArray);
