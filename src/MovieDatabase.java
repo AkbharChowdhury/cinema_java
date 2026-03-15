@@ -121,7 +121,7 @@ public final class MovieDatabase {
 
 
     private int executeUpdate(String sql, SQLConsumer<PreparedStatement> parameterSetter) {
-        try (var con = this.getConnection();
+        try (var con = getConnection();
              var stmt = con.prepareStatement(sql)) {
             parameterSetter.accept(stmt);
             return stmt.executeUpdate();
