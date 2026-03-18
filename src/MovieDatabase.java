@@ -1,7 +1,6 @@
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import interfaces.SQLConsumer;
-import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -125,7 +124,7 @@ public final class MovieDatabase {
     public boolean deleteRecord(String tableName, String idField, int id) {
         RecordValidator.validateDelete(tableName, idField);
         String sql = String.format(DELETE_SQL, tableName, idField);
-        return executeUpdate(sql, stmt -> stmt.setInt(1, id)) != 0;
+        return executeUpdate(sql, s -> s.setInt(1, id)) != 0;
     }
 
 
@@ -150,9 +149,9 @@ public final class MovieDatabase {
 
     public void updateMovieTitle(String newTitle, int movieId) {
         if (newTitle == null || newTitle.isBlank()) throw new IllegalArgumentException("Movie title cannot be empty");
-        SQLConsumer<PreparedStatement> parameterSetter = stmt -> {
-            stmt.setString(1, newTitle);
-            stmt.setInt(2, movieId);
+        SQLConsumer<PreparedStatement> parameterSetter = s -> {
+            s.setString(1, newTitle);
+            s.setInt(2, movieId);
         };
 
         int affectedRows = executeUpdate(UPDATE_MOVIE_TITLE_SQL, parameterSetter);
@@ -169,8 +168,7 @@ public final class MovieDatabase {
         try (var con = getConnection();
              var stmt = con.prepareCall(ADD_MOVIE_WITH_GENRES_SQL)) {
             stmt.setString(1, title);
-            Array genreArray = con.createArrayOf("INTEGER", genreIds.toArray(new Integer[0]));
-            stmt.setArray(2, genreArray);
+            stmt.setArray(2,  con.createArrayOf("INTEGER", genreIds.toArray(new Integer[0])));
             stmt.execute();  // use execute() for procedures
             return true;
 
