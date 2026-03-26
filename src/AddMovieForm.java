@@ -48,6 +48,7 @@ public class AddMovieForm extends JFrame {
 
         setSize(400, 400);
         WindowUtils.applyAutofocus.accept(txtTitle);
+        setVisible(true);
 
     }
 
@@ -61,20 +62,13 @@ public class AddMovieForm extends JFrame {
             return;
         }
 
-        clearForm();
         Messages.message.accept("Movie Added");
         WindowUtils.openMainMenu(this, mainMenu);
     }
 
 
-    private void clearForm() {
-        txtTitle.setText(null);
-        genreCheckboxes.forEach(checkbox ->  checkbox.setState(false));
-    }
-
-
     static void main() {
-        new AddMovieForm(mainMenu).setVisible(true);
+        new AddMovieForm(mainMenu);
     }
 
 }

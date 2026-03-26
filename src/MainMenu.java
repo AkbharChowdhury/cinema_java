@@ -45,14 +45,13 @@ public class MainMenu extends JFrame implements ActionListener {
     private final JComboBox<String> comboBoxGenres = new JComboBox<>();
     private final JTable table = new JTable();
     private final DefaultTableModel tableModel = new DefaultTableModel(new String[]{"Title", "Genres"}, 0) {
-
         @Override
         public boolean isCellEditable(int row, int column) {
             return false;
         }
     };
     private final Map<Object, Runnable> componentActions = Map.of(
-            btnAdd, () -> new AddMovieForm(this).setVisible(true),
+            btnAdd, () -> new AddMovieForm(this),
             btnEdit, this::editMovieAction,
             btnRemove, this::removeMovieAction,
             comboBoxGenres, this::genreAction
@@ -149,7 +148,8 @@ public class MainMenu extends JFrame implements ActionListener {
         openEditMovieForm(movieId);
 
     }
-    private void openExistingForm(JFrame existing){
+
+    private void openExistingForm(JFrame existing) {
         existing.toFront();
         existing.requestFocus();
         existing.setState(JFrame.NORMAL); // if minimized
@@ -166,7 +166,8 @@ public class MainMenu extends JFrame implements ActionListener {
 
         openMovie(movieId);
     }
-    private void openMovie(int movieId){
+
+    private void openMovie(int movieId) {
         EditMovieForm form = new EditMovieForm(this, movieId);
         openEditors.put(movieId, form);
         form.addWindowListener(new WindowAdapter() {

@@ -28,7 +28,7 @@ public final class MovieFormValidator {
         boolean hasSelectedGenre = GenreSelectionUtils.hasSelectedGenre(genreCheckboxes);
         String title = txtTitle.getText();
         if (title == null || title.isBlank()) {
-            Messages.showError.accept("Title is Empty", "Please enter a movie title");
+            Messages.showError.accept("Missing Title", "Please enter a movie title");
             return false;
         }
         if (!hasSelectedGenre) {
