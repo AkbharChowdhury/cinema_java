@@ -103,7 +103,8 @@ public class EditMovieForm extends JFrame {
     private void updateMovie() {
         db.updateMovieTitle(txtTitle.getText().trim(), MOVIE_ID);
         MovieSchema.deleteMovie(MovieTable.MOVIE_GENRES, MOVIE_ID, db);
-        List<Integer> selectedGenreIds = GenreSelectionUtils.getSelectedGenres(genreCheckboxes, genres).stream().map(Genre::id).toList();
+        List<Genre> selectedGenres = GenreSelectionUtils.getSelectedGenres(genreCheckboxes, genres);
+        List<Integer> selectedGenreIds = GenreSelectionUtils.getSelectedGenreIds(selectedGenres);
         db.addGenresToMovie(MOVIE_ID, selectedGenreIds);
         Messages.message.accept("Movie updated");
         WindowUtils.openMainMenu(this, mainMenu);

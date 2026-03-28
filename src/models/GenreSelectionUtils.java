@@ -21,7 +21,14 @@ public final class GenreSelectionUtils {
                 .collect(Collectors.toSet());
 
         return genres.stream()
-                .filter(genre -> selectedLabels.contains(genre.name()))
+                .filter(genre ->  selectedLabels.contains(genre.name()))
+                .toList();
+    }
+
+    public static List<Integer> getSelectedGenreIds(List<Genre> genres) {
+        return genres
+                .stream()
+                .map(Genre::id)
                 .toList();
     }
 
