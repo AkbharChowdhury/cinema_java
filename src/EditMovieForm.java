@@ -2,7 +2,6 @@ import enums.MovieTable;
 import java.awt.BorderLayout;
 import java.awt.Checkbox;
 import java.awt.GridLayout;
-import java.util.Collections;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -15,26 +14,29 @@ import models.Genre;
 import models.GenreSelectionUtils;
 import models.Messages;
 import models.MovieFormValidator;
+import models.PanelFactory;
 
 
 public class EditMovieForm extends JFrame {
     private final MainMenu mainMenu;
     private final int MOVIE_ID;
-    private final MovieDatabase db = MovieDatabase.getInstance();
+    private final MovieDatabase db;
     private final List<String> originalSelectedGenres;
     private final String MOVIE_TITLE;
-    private final List<Genre> genres = Collections.unmodifiableList(db.fetchAllGenres());
+    private final List<Genre> genres;
     private final JTextField txtTitle = new JTextField(40);
     private final JButton btnUpdateMovie = ButtonFactory.createButton("Update Movie", _ -> updateMovieAction());
     private final JButton btnUndoGenre = ButtonFactory.createButton("Undo Genre", _ -> undoGenreSelection());
     private final JButton btnUndoTitle;
     private final List<Checkbox> genreCheckboxes;
+
     private List<Checkbox> createGenreCheckboxes() {
         return genres.stream()
                 .map(this::createCheckbox)
                 .toList();
     }
-    private Checkbox createCheckbox(Genre genre){
+
+    private Checkbox createCheckbox(Genre genre) {
         Checkbox checkbox = new Checkbox(genre.name());
         checkbox.setState(originalSelectedGenres.contains(genre.name()));
         return checkbox;
@@ -42,10 +44,12 @@ public class EditMovieForm extends JFrame {
     }
 
     public EditMovieForm(MainMenu mainMenuForm, int movieId) {
+        db = MovieDatabase.getInstance();
+        genres = db.fetchAllGenres();
         MOVIE_ID = movieId;
         MOVIE_TITLE = db.fetchMovieTitle(MOVIE_ID).orElse("Movie title not found");
         btnUndoTitle = ButtonFactory.createButton("Undo title", _ -> txtTitle.setText(MOVIE_TITLE));
-        originalSelectedGenres =  List.copyOf(db.fetchMovieGenres(MOVIE_ID));
+        originalSelectedGenres = List.copyOf(db.fetchMovieGenres(MOVIE_ID));
         btnUpdateMovie.setToolTipText("Save changes to the movie");
         btnUndoGenre.setToolTipText("Undo changes to genres");
         btnUndoTitle.setToolTipText("Undo changes to the title");
@@ -53,7 +57,8 @@ public class EditMovieForm extends JFrame {
         txtTitle.setText(MOVIE_TITLE);
         setTitle("Edit Movie");
         JPanel panel = new JPanel();
-        JPanel top = new JPanel();
+        JPanel top = PanelFactory.leftFlowPanelWithPadding();
+
         JPanel middle = new JPanel();
         panel.setLayout(new BorderLayout());
 
@@ -108,7 +113,6 @@ public class EditMovieForm extends JFrame {
         db.addGenresToMovie(MOVIE_ID, selectedGenreIds);
         Messages.message.accept("Movie updated");
         WindowUtils.openMainMenu(this, mainMenu);
-
     }
 
     void main() {

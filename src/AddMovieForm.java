@@ -14,24 +14,31 @@ import models.GenreCheckboxFactory;
 import models.GenreSelectionUtils;
 import models.Messages;
 import models.MovieFormValidator;
+import models.PanelFactory;
 
 public class AddMovieForm extends JFrame {
     private static MainMenu mainMenu;
-    private final MovieDatabase db = MovieDatabase.getInstance();
-    private final List<Genre> genres = db.fetchAllGenres();
+    private final MovieDatabase db;
+    private final List<Genre> genres;
     private final JTextField txtTitle = new JTextField(20);
     private final JButton btnAddMovie = ButtonFactory.createButton("Add Movie", _ -> handleAddMovie());
     private final List<Checkbox> genreCheckboxes;
 
     public AddMovieForm(MainMenu mainMenuForm) {
+        db = MovieDatabase.getInstance();
+        genres = db.fetchAllGenres();
         mainMenu = mainMenuForm;
+
+//
+        JPanel top = PanelFactory.leftFlowPanelWithPadding();
+
+        JPanel middle = new JPanel();
 
         btnAddMovie.setToolTipText("Add a new movie with the selected genres");
         setTitle("Add Movie");
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
-        JPanel top = new JPanel();
-        JPanel middle = new JPanel();
+
         top.add(new JLabel("Movie"));
         top.add(txtTitle);
         middle.setLayout(new GridLayout(genres.size(), 2));
@@ -43,6 +50,9 @@ public class AddMovieForm extends JFrame {
         panel.add(middle, BorderLayout.CENTER);
         panel.add(btnAddMovie, BorderLayout.SOUTH);
 
+
+//        panel.add(bottom, BorderLayout.SOUTH);
+
         setContentPane(panel);
         setDefaultCloseOperation(MainMenuState.getCloseOperation());
 
@@ -52,18 +62,15 @@ public class AddMovieForm extends JFrame {
 
     }
 
-
     private void handleAddMovie() {
         if (!MovieFormValidator.validateForm(txtTitle, genreCheckboxes)) return;
         List<Genre> selectedGenres = GenreSelectionUtils.getSelectedGenres(genreCheckboxes, genres);
-
         List<Integer> selectedGenreIds = GenreSelectionUtils.getSelectedGenreIds(selectedGenres);
         boolean hasAddedMovie = db.addMovieWithGenres(txtTitle.getText().trim(), new HashSet<>(selectedGenreIds));
         if (!hasAddedMovie) {
-            Messages.showError.accept("", "There was an error adding the movie");
+            Messages.showError.accept("Could not add movie", "There was an error adding the movie");
             return;
         }
-
         Messages.message.accept("Movie Added");
         WindowUtils.openMainMenu(this, mainMenu);
     }

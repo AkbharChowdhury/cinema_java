@@ -32,9 +32,9 @@ import models.SearchMovies;
 
 public class MainMenu extends JFrame implements ActionListener {
     private final Map<Integer, EditMovieForm> openEditors = new HashMap<>();
-    private final MovieDatabase db = MovieDatabase.getInstance();
-    private List<Movie> movies = db.fetchMovies();
-    private final SearchMovies search = new SearchMovies(movies);
+    private final MovieDatabase db;
+    private List<Movie> movies;
+    private final SearchMovies search;
 
     private final JButton btnAdd = new JButton("Add");
     private final JButton btnEdit = new JButton("Edit");
@@ -70,6 +70,9 @@ public class MainMenu extends JFrame implements ActionListener {
     }
 
     public MainMenu() {
+        db = MovieDatabase.getInstance();
+        movies = db.fetchMovies();
+        search = new SearchMovies(movies);
         buttonToolTips();
         tableProperties();
         comboBoxGenres.setModel(new DefaultComboBoxModel<>(new Vector<>(getGenres())));
